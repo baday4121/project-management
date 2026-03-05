@@ -13,6 +13,7 @@ import {
   TASK_STATUS_BADGE_MAP,
 } from "@/utils/constants";
 import { useTruncate } from "@/hooks/use-truncate";
+import { Calendar, Layers } from "lucide-react";
 
 type ActiveTasksTableProps = {
   activeTasks: PaginatedTask;
@@ -50,16 +51,20 @@ export function ActiveTasksTable({
       {
         accessorKey: "task_number",
         header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
-        cell: ({ row }) => `#${row.original.task_number}`,
+        cell: ({ row }) => <span className="font-mono text-muted-foreground">#{row.original.task_number}</span>,
       },
       {
         accessorKey: "project.name",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Project" />
+          <DataTableColumnHeader column={column} title="Proyek" />
         ),
         enableSorting: false,
         cell: ({ row }) => (
-          <Link href={route("project.show", row.original.project.id)}>
+          <Link 
+            href={route("project.show", row.original.project.id)}
+            className="flex items-center gap-2 font-medium text-primary hover:underline"
+          >
+            <Layers className="h-3.5 w-3.5" />
             {row.original.project.name}
           </Link>
         ),
@@ -67,35 +72,37 @@ export function ActiveTasksTable({
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Task Name" />
+          <DataTableColumnHeader column={column} title="Nama Tugas" />
         ),
         cell: ({ row }) => (
-          <Link
-            className="group flex flex-col items-start gap-1.5 md:flex-row md:items-center md:justify-between"
-            href={route("task.show", row.original.id)}
-          >
-            <span>{row.original.name}</span>
-            <div className="flex items-center gap-2">
-              {row.original.labels?.slice(0, 2).map((label) => {
+          <div className="flex flex-col gap-1.5 py-1">
+            <Link
+              className="font-bold text-foreground hover:text-primary transition-colors tracking-tight"
+              href={route("task.show", row.original.id)}
+            >
+              {row.original.name}
+            </Link>
+            <div className="flex flex-wrap gap-1">
+              {row.original.labels?.slice(0, 3).map((label) => {
                 const truncatedName = useTruncate(label.name);
                 return (
-                  <Badge key={label.id} variant={label.variant}>
+                  <Badge key={label.id} variant={label.variant} className="text-[10px] px-1.5 py-0">
                     {truncatedName}
                   </Badge>
                 );
               })}
             </div>
-          </Link>
+          </div>
         ),
-        minWidth: 200,
+        minWidth: 250,
       },
       {
         accessorKey: "priority",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Priority" />
+          <DataTableColumnHeader column={column} title="Prioritas" />
         ),
         cell: ({ row }) => (
-          <Badge variant={TASK_PRIORITY_BADGE_MAP[row.original.priority]}>
+          <Badge variant={TASK_PRIORITY_BADGE_MAP[row.original.priority]} className="font-bold">
             {TASK_PRIORITY_TEXT_MAP[row.original.priority]}
           </Badge>
         ),
@@ -112,6 +119,7 @@ export function ActiveTasksTable({
               row.original.status.slug,
               row.original.status.color,
             )}
+            className="shadow-sm"
           >
             {row.original.status.name}
           </Badge>
@@ -120,47 +128,35 @@ export function ActiveTasksTable({
       {
         accessorKey: "due_date",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Due Date" />
+          <DataTableColumnHeader column={column} title="Tenggat" />
         ),
-        cell: ({ row }) =>
-          row.original.due_date ? formatDate(row.original.due_date) : "No date",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2 text-muted-foreground">
+             <Calendar className="h-3.5 w-3.5" />
+             <span className="text-sm">
+                {row.original.due_date ? formatDate(row.original.due_date) : "Tanpa Tanggal"}
+             </span>
+          </div>
+        )
       },
       {
         accessorKey: "updated_at",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Last Updated" />
+          <DataTableColumnHeader column={column} title="Pembaruan Terakhir" />
         ),
         cell: ({ row }) => formatDate(row.original.updated_at),
         defaultHidden: true,
-      },
-      {
-        accessorKey: "label_ids",
-        defaultHidden: true,
-        hideFromViewOptions: true,
       },
       {
         id: "actions",
         cell: ({ row }) => (
           <DataTableRowActions
             row={row}
-            onView={(row) => {
-              const taskId = row.original.id;
-              router.get(route("task.show", taskId));
-            }}
-            onEdit={(row) => {
-              const taskId = row.original.id;
-              router.get(route("task.edit", taskId));
-            }}
-            onDelete={(row) => {
-              const taskId = row.original.id;
-              router.delete(route("task.destroy", taskId));
-            }}
-            onAssign={(row) => {
-              router.post(route("task.assignToMe", row.original.id));
-            }}
-            onUnassign={(row) => {
-              router.post(route("task.unassign", row.original.id));
-            }}
+            onView={(row) => router.get(route("task.show", row.original.id))}
+            onEdit={(row) => router.get(route("task.edit", row.original.id))}
+            onDelete={(row) => router.delete(route("task.destroy", row.original.id))}
+            onAssign={(row) => router.post(route("task.assignToMe", row.original.id))}
+            onUnassign={(row) => router.post(route("task.unassign", row.original.id))}
             canEdit={permissions.canManageTasks}
           />
         ),
@@ -172,24 +168,24 @@ export function ActiveTasksTable({
   const filterableColumns: FilterableColumn[] = [
     {
       accessorKey: "project_id",
-      title: "Project",
+      title: "Proyek",
       filterType: "select",
       options: projectOptions,
     },
     {
       accessorKey: "name",
-      title: "Name",
+      title: "Nama",
       filterType: "text",
     },
     {
       accessorKey: "label_ids",
-      title: "Labels",
+      title: "Label",
       filterType: "select",
       options: labelOptions,
     },
     {
       accessorKey: "priority",
-      title: "Priority",
+      title: "Prioritas",
       filterType: "select",
       options: Object.entries(TASK_PRIORITY_TEXT_MAP).map(([value, label]) => ({
         value,
@@ -197,30 +193,35 @@ export function ActiveTasksTable({
       })),
     },
     {
-      accessorKey: "status", // Change back to 'status' for slug-based filtering
+      accessorKey: "status",
       title: "Status",
       filterType: "select",
       options: statusOptions,
     },
     {
       accessorKey: "due_date",
-      title: "Due Date",
+      title: "Tenggat Waktu",
       filterType: "date",
     },
   ];
 
   return (
-    <>
-      <h4 className="mb-3 text-sm text-muted-foreground">
-        This table displays the active tasks assigned to you.
-      </h4>
-      <DataTable
-        columns={columns}
-        entity={activeTasks}
-        filterableColumns={filterableColumns}
-        queryParams={queryParams}
-        routeName="dashboard"
-      />
-    </>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-2">
+        <p className="text-sm font-medium text-muted-foreground">
+          Daftar tugas aktif yang saat ini ditugaskan kepada Anda.
+        </p>
+      </div>
+      
+      <div className="rounded-xl border bg-card/50 overflow-hidden shadow-sm">
+        <DataTable
+          columns={columns}
+          entity={activeTasks}
+          filterableColumns={filterableColumns}
+          queryParams={queryParams}
+          routeName="dashboard"
+        />
+      </div>
+    </div>
   );
 }

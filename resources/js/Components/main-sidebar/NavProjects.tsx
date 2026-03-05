@@ -48,29 +48,31 @@ export function NavProjects({ projects }: { projects: ProjectWithPermissions[] }
 
   const handleLeaveClick = (projectId: string) => {
     showConfirmation({
-      title: "Confirm Project Leave",
-      description: "Are you sure you want to leave this project?",
+      title: "Konfirmasi Keluar Proyek",
+      description: "Apakah Anda yakin ingin keluar dari proyek ini?",
       action: () =>
         router.post(route("project.leave", { project: projectId }), {
           preserveScroll: true,
         }),
-      actionText: "Leave",
+      actionText: "Keluar",
     });
   };
 
   const handleDeleteClick = (projectId: string) => {
     showConfirmation({
-      title: "Confirm Project Deletion",
+      title: "Konfirmasi Penghapusan Proyek",
       description:
-        "Are you sure you want to delete this project? This action cannot be undone.",
+        "Anda yakin ingin menghapus proyek ini? Tindakan ini tidak dapat dibatalkan.",
       action: () => router.delete(route("project.destroy", projectId)),
-      actionText: "Delete",
+      actionText: "Hapus",
     });
   };
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Recent Projects</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+        Proyek Terbaru
+      </SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item, index) => {
           const StatusIcon = STATUS_CONFIG[item.status].icon;
@@ -78,39 +80,40 @@ export function NavProjects({ projects }: { projects: ProjectWithPermissions[] }
 
           return (
             <SidebarMenuItem key={`${item.name}-${index}`} title={item.name}>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild className="transition-colors hover:bg-primary/5">
                 <Link href={item.url} className="flex items-center gap-2">
                   <span className="shrink-0" title={STATUS_CONFIG[item.status].text}>
                     <StatusIcon
                       className={`h-4 w-4 ${STATUS_CONFIG[item.status].color}`}
                     />
                   </span>
-                  <span className="truncate">{item.name}</span>
+                  <span className="truncate font-medium">{item.name}</span>
                 </Link>
               </SidebarMenuButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
+                  <SidebarMenuAction showOnHover className="hover:bg-primary/10 transition-colors">
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Menu</span>
                   </SidebarMenuAction>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-48 rounded-lg"
+                  className="w-56 rounded-xl shadow-xl border-primary/5"
                   side={isMobile ? "bottom" : "right"}
                   align={isMobile ? "end" : "start"}
                 >
-                  <DropdownMenuItem onSelect={() => router.get(item.url)}>
-                    <Eye className="h-4 w-4" />
-                    <span>View Project</span>
+                  <DropdownMenuItem onSelect={() => router.get(item.url)} className="gap-2 cursor-pointer">
+                    <Eye className="h-4 w-4 text-primary" />
+                    <span>Lihat Proyek</span>
                   </DropdownMenuItem>
 
                   {item.permissions.canEdit && (
                     <DropdownMenuItem
                       onSelect={() => router.get(route("project.edit", projectId))}
+                      className="gap-2 cursor-pointer"
                     >
-                      <Pencil className="h-4 w-4" />
-                      <span>Edit Project</span>
+                      <Pencil className="h-4 w-4 text-primary" />
+                      <span>Edit Proyek</span>
                     </DropdownMenuItem>
                   )}
 
@@ -118,9 +121,10 @@ export function NavProjects({ projects }: { projects: ProjectWithPermissions[] }
                     onSelect={() =>
                       router.get(route("task.create", { project_id: projectId }))
                     }
+                    className="gap-2 cursor-pointer"
                   >
-                    <Plus className="h-4 w-4" />
-                    <span>Create Task</span>
+                    <Plus className="h-4 w-4 text-primary" />
+                    <span>Buat Tugas</span>
                   </DropdownMenuItem>
 
                   {item.permissions.canEdit && (
@@ -133,9 +137,10 @@ export function NavProjects({ projects }: { projects: ProjectWithPermissions[] }
                           }),
                         )
                       }
+                      className="gap-2 cursor-pointer"
                     >
-                      <UsersRound className="h-4 w-4" />
-                      <span>Invite User</span>
+                      <UsersRound className="h-4 w-4 text-primary" />
+                      <span>Undang Anggota</span>
                     </DropdownMenuItem>
                   )}
 
@@ -143,19 +148,19 @@ export function NavProjects({ projects }: { projects: ProjectWithPermissions[] }
 
                   {item.permissions.isCreator ? (
                     <DropdownMenuItem
-                      className="text-red-500"
+                      className="text-red-500 gap-2 cursor-pointer focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/20"
                       onSelect={() => handleDeleteClick(projectId)}
                     >
                       <Trash2 className="h-4 w-4" />
-                      <span>Delete Project</span>
+                      <span>Hapus Proyek</span>
                     </DropdownMenuItem>
                   ) : (
                     <DropdownMenuItem
-                      className="text-red-500"
+                      className="text-red-500 gap-2 cursor-pointer focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/20"
                       onSelect={() => handleLeaveClick(projectId)}
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>Leave Project</span>
+                      <span>Keluar dari Proyek</span>
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -164,10 +169,10 @@ export function NavProjects({ projects }: { projects: ProjectWithPermissions[] }
           );
         })}
         <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <Link href={route("project.index")}>
-              <MoreHorizontal className="text-sidebar-foreground/70" />
-              <span>More</span>
+          <SidebarMenuButton asChild className="hover:bg-primary/5">
+            <Link href={route("project.index")} className="flex items-center gap-2">
+              <MoreHorizontal className="h-4 w-4 text-sidebar-foreground/70" />
+              <span className="text-muted-foreground">Lihat Semua</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

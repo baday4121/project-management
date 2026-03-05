@@ -7,7 +7,7 @@ import InputError from "@/Components/InputError";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { FormEventHandler } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
-import { Check, LogIn, LockKeyhole } from "lucide-react";
+import { Check, LogIn, Mail, LockKeyhole } from "lucide-react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import {
   Card,
@@ -58,24 +58,24 @@ export default function Login({
 
   return (
     <AuthFlowLayout>
-      <Head title="Masuk ke Akun" />
+      <Head title="Masuk ke Workdei" />
       
       {status && (
-        <Alert className="mb-6 border-none bg-green-500/10 text-green-600 shadow-sm" variant="success">
+        <Alert className="mb-6 border-none bg-emerald-500/15 text-emerald-600 shadow-sm dark:bg-emerald-500/10" variant="success">
           <Check className="h-4 w-4" />
           <AlertTitle className="font-bold">Berhasil</AlertTitle>
           <AlertDescription>{status}</AlertDescription>
         </Alert>
       )}
 
-      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
+      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5 bg-card/80 backdrop-blur-sm">
         <CardHeader className="space-y-1 pb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <LockKeyhole className="h-6 w-6 text-primary" />
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
+            <LockKeyhole className="h-7 w-7" />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight">Masuk</CardTitle>
-          <CardDescription className="text-base text-muted-foreground">
-            Masukkan email dan kata sandi Anda untuk mengakses dashboard Workdei
+          <CardTitle className="text-3xl font-black tracking-tight">Login</CardTitle>
+          <CardDescription className="text-base">
+            Selamat datang kembali! Silakan masuk ke akun Anda.
           </CardDescription>
         </CardHeader>
         
@@ -83,15 +83,18 @@ export default function Login({
           <form onSubmit={submit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email">Alamat Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="nama@perusahaan.com"
-                value={data.email}
-                onChange={(e) => setData("email", e.target.value)}
-                required
-                className="h-11"
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="nama@perusahaan.com"
+                  className="h-11 pl-10 transition-all focus:ring-2 focus:ring-primary/20"
+                  value={data.email}
+                  onChange={(e) => setData("email", e.target.value)}
+                  required
+                />
+              </div>
               <InputError message={errors.email} />
             </div>
 
@@ -103,19 +106,22 @@ export default function Login({
                     href={route("password.request")}
                     className="text-xs font-medium text-primary hover:underline"
                   >
-                    Lupa kata sandi?
+                    Lupa sandi?
                   </Link>
                 )}
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={data.password}
-                onChange={(e) => setData("password", e.target.value)}
-                required
-                className="h-11"
-              />
+              <div className="relative">
+                <LockKeyhole className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  className="h-11 pl-10 transition-all focus:ring-2 focus:ring-primary/20"
+                  value={data.password}
+                  onChange={(e) => setData("password", e.target.value)}
+                  required
+                />
+              </div>
               <InputError message={errors.password} />
             </div>
 
@@ -129,22 +135,22 @@ export default function Login({
               />
               <label
                 htmlFor="remember"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
               >
                 Ingat saya di perangkat ini
               </label>
             </div>
 
             <div className="space-y-4 pt-2">
-              <Button type="submit" className="h-11 w-full text-base font-bold shadow-lg" disabled={processing}>
+              <Button type="submit" className="h-11 w-full text-base font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" disabled={processing}>
                 <LogIn className="mr-2 h-5 w-5" />
                 Masuk Sekarang
               </Button>
               
               <div className="relative flex items-center py-2">
                 <Separator className="flex-1" />
-                <span className="mx-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Atau masuk dengan
+                <span className="mx-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Atau gunakan
                 </span>
                 <Separator className="flex-1" />
               </div>
@@ -152,17 +158,16 @@ export default function Login({
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   variant="outline"
-                  className="h-11"
+                  className="h-11 border-muted-foreground/20 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 transition-colors"
                   type="button"
                   onClick={() => handleSocialLogin("google")}
                 >
-                  <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
+                  <FaGoogle className="mr-2 h-4 w-4" />
                   Google
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-11"
-                )
+                  className="h-11 border-muted-foreground/20 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   type="button"
                   onClick={() => handleSocialLogin("github")}
                 >
@@ -174,8 +179,8 @@ export default function Login({
           </form>
         </CardContent>
         
-        <CardFooter className="flex flex-wrap justify-center gap-1 pb-8 text-sm text-muted-foreground">
-          <span>Belum punya akun?</span>
+        <CardFooter className="flex flex-wrap justify-center gap-1 border-t bg-muted/30 py-6 text-sm">
+          <span className="text-muted-foreground">Belum punya akun?</span>
           <Link href={route("register")} className="font-bold text-primary hover:underline">
             Daftar Gratis
           </Link>

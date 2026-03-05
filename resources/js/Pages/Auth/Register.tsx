@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/Components/ui/card";
-import { UserPlus, User, Mail, Lock } from "lucide-react";
+import { UserPlus, User, Mail, Lock, LogIn } from "lucide-react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { Separator } from "@/Components/ui/separator";
 import PasswordStrengthMeter from "@/Components/PasswordStrengthMeter";
@@ -55,28 +55,29 @@ export default function Register() {
     <AuthFlowLayout>
       <Head title="Daftar Akun Baru" />
       
-      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
+      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5 bg-card/80 backdrop-blur-sm">
         <CardHeader className="space-y-1 pb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <UserPlus className="h-6 w-6" />
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
+            <UserPlus className="h-7 w-7" />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight">Daftar Akun</CardTitle>
-          <CardDescription className="text-base text-muted-foreground">
-            Lengkapi data di bawah untuk mulai menggunakan Workdei
+          <CardTitle className="text-3xl font-black tracking-tight">Buat Akun</CardTitle>
+          <CardDescription className="text-base">
+            Lengkapi detail di bawah untuk memulai perjalanan Anda.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={submit} className="space-y-5">
-            {/* Input Nama */}
+            {/* Nama */}
             <div className="space-y-2">
               <Label htmlFor="name">Nama Lengkap</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="name"
-                  placeholder="Masukkan nama Anda"
-                  className="pl-10 h-11"
+                  type="text"
+                  placeholder="Nama Lengkap Anda"
+                  className="h-11 pl-10 transition-all focus:ring-2 focus:ring-primary/20"
                   value={data.name}
                   onChange={(e) => setData("name", e.target.value)}
                   required
@@ -85,7 +86,7 @@ export default function Register() {
               <InputError message={errors.name} />
             </div>
 
-            {/* Input Email */}
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Alamat Email</Label>
               <div className="relative">
@@ -94,7 +95,7 @@ export default function Register() {
                   id="email"
                   type="email"
                   placeholder="nama@email.com"
-                  className="pl-10 h-11"
+                  className="h-11 pl-10 transition-all focus:ring-2 focus:ring-primary/20"
                   value={data.email}
                   onChange={(e) => setData("email", e.target.value)}
                   required
@@ -103,7 +104,7 @@ export default function Register() {
               <InputError message={errors.email} />
             </div>
 
-            {/* Input Password */}
+            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Kata Sandi</Label>
               <div className="relative">
@@ -111,8 +112,8 @@ export default function Register() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Buat kata sandi kuat"
-                  className="pl-10 h-11"
+                  placeholder="Minimal 8 karakter"
+                  className="h-11 pl-10 transition-all focus:ring-2 focus:ring-primary/20"
                   value={data.password}
                   onChange={(e) => setData("password", e.target.value)}
                   required
@@ -123,6 +124,7 @@ export default function Register() {
                 type="single"
                 collapsible
                 value={data.password.length > 0 ? "password-meter" : ""}
+                className="w-full"
               >
                 <AccordionItem value="password-meter" className="border-none">
                   <AccordionContent className="pb-0 pt-2">
@@ -144,8 +146,8 @@ export default function Register() {
                 <Input
                   id="password_confirmation"
                   type="password"
-                  placeholder="Ulangi kata sandi"
-                  className="pl-10 h-11"
+                  placeholder="Ulangi kata sandi Anda"
+                  className="h-11 pl-10 transition-all focus:ring-2 focus:ring-primary/20"
                   value={data.password_confirmation}
                   onChange={(e) => setData("password_confirmation", e.target.value)}
                   required
@@ -157,9 +159,10 @@ export default function Register() {
             <div className="pt-2 space-y-4">
               <Button
                 type="submit"
-                className="h-11 w-full text-base font-bold shadow-lg shadow-primary/20"
+                className="h-11 w-full text-base font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
                 disabled={processing || !isPasswordValid || !data.password_confirmation}
               >
+                <LogIn className="mr-2 h-5 w-5" />
                 <span>Daftar Sekarang</span>
               </Button>
 
@@ -175,7 +178,7 @@ export default function Register() {
 
               <div className="relative flex items-center py-2">
                 <Separator className="flex-1" />
-                <span className="mx-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <span className="mx-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">
                   Atau daftar dengan
                 </span>
                 <Separator className="flex-1" />
@@ -184,16 +187,16 @@ export default function Register() {
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   variant="outline"
-                  className="h-11 font-medium"
+                  className="h-11 border-muted-foreground/20 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 transition-colors"
                   type="button"
                   onClick={() => handleSocialLogin("google")}
                 >
-                  <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
+                  <FaGoogle className="mr-2 h-4 w-4" />
                   Google
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-11 font-medium"
+                  className="h-11 border-muted-foreground/20 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   type="button"
                   onClick={() => handleSocialLogin("github")}
                 >

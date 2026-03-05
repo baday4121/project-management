@@ -7,6 +7,9 @@ import {
   CardTitle,
 } from "@/Components/ui/card";
 import { Quote } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+import { useEffect } from "react";
 
 interface TestimonialProps {
   image: string;
@@ -61,49 +64,54 @@ const testimonials: TestimonialProps[] = [
 ];
 
 export const Testimonials = () => {
+  // Setup Autoplay dan Carousel
+  const [emblaRef] = useEmblaCarousel({ loop: true, align: "start" }, [
+    Autoplay({ delay: 4000, stopOnInteraction: false }),
+  ]);
+
   return (
-    <section
-      id="testimonials"
-      className="container mx-auto max-w-7xl px-4 py-24 sm:py-32"
-    >
-      <div className="mb-12 text-center lg:text-left">
+    <section id="testimonials" className="container mx-auto max-w-7xl px-4 py-20">
+      <div className="mb-12 text-center">
         <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
           Dipercaya oleh Tim{" "}
-          <span className="bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
             Seluruh Dunia
           </span>
         </h2>
-        <p className="mt-4 text-xl text-muted-foreground">
-          Lihat bagaimana WorkDei membantu tim berkolaborasi lebih baik dan menyelesaikan proyek lebih cepat.
+        <p className="mt-4 text-muted-foreground">
+          Apa kata mereka tentang pengalaman menggunakan WorkDei.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {testimonials.map(({ image, name, userName, comment }: TestimonialProps) => (
-          <Card
-            key={userName}
-            className="flex flex-col justify-between border-none bg-muted/40 shadow-none transition-all hover:bg-muted/70"
-          >
-            <CardHeader className="flex flex-row items-center gap-4 pb-4">
-              <Avatar className="h-12 w-12 border-2 border-primary/20 p-0.5">
-                <AvatarImage alt={name} src={image} className="rounded-full" />
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  {name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="flex flex-col">
-                <CardTitle className="text-lg font-bold">{name}</CardTitle>
-                <CardDescription className="text-sm">{userName}</CardDescription>
-              </div>
-            </CardHeader>
-
-            <CardContent className="relative">
-              <Quote className="absolute -top-2 right-4 h-8 w-8 rotate-180 text-primary/10" />
-              <p className="relative z-10 text-muted-foreground italic">"{comment}"</p>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Viewport Carousel */}
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {testimonials.map(({ image, name, userName, comment }: TestimonialProps) => (
+            <div 
+              key={userName} 
+              className="flex-[0_0_100%] min-w-0 pl-4 md:flex-[0_0_50%] lg:flex-[0_0_33.33%]"
+            >
+              <Card className="h-full border border-primary/10 bg-muted/30 shadow-sm transition-colors hover:bg-muted/50">
+                <CardHeader className="flex flex-row items-center gap-4 pb-4">
+                  <Avatar className="h-10 w-10 border border-primary/20">
+                    <AvatarImage alt={name} src={image} />
+                    <AvatarFallback>{name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <CardTitle className="text-base font-bold">{name}</CardTitle>
+                    <CardDescription className="text-xs">{userName}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="relative">
+                  <Quote className="absolute -top-2 right-4 h-6 w-6 rotate-180 text-primary/10" />
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    "{comment}"
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

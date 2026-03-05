@@ -24,7 +24,7 @@ export const Hero = () => {
 
           {/* Deskripsi */}
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            Optimalkan alur kerja tim Anda dengan solusi manajemen proyek **WorkDei**. 
+            Optimalkan alur kerja tim Anda dengan solusi manajemen proyek WorkDei. 
             Pantau tugas, kolaborasi real-time, dan capai target lebih mudah dalam satu platform terpadu.
           </p>
         </div>

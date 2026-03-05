@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
@@ -11,20 +11,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import InputError from "@/Components/InputError";
 import { useToast } from "@/hooks/use-toast";
 import { DateTimePicker } from "@/Components/ui/time-picker/date-time-picker";
 import { PROJECT_STATUS_TEXT_MAP } from "@/utils/constants";
 import { Project } from "@/types/project";
-import { Trash2 } from "lucide-react";
-import { router } from "@inertiajs/react";
+import { Trash2, PencilLine, ImagePlus, Calendar, Info, ArrowLeft, Save } from "lucide-react";
 
 type Props = {
   project: Project;
 };
 
 export default function Edit({ project }: Props) {
-  const { data, setData, post, errors, reset } = useForm({
+  const { data, setData, post, errors, processing } = useForm({
     image: null as File | null,
     name: project.name || "",
     description: project.description || "",
@@ -40,14 +40,19 @@ export default function Edit({ project }: Props) {
 
     post(route("project.update", project.id), {
       preserveState: true,
-      onSuccess: () => reset(),
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Data proyek telah diperbarui.",
+          variant: "success",
+        });
+      },
       onError: (error) => {
         const errorMessage = Object.values(error).join(" ");
         toast({
-          title: "Failed to update project",
+          title: "Gagal memperbarui proyek",
           variant: "destructive",
           description: errorMessage,
-          duration: 5000,
         });
       },
     });
@@ -57,8 +62,8 @@ export default function Edit({ project }: Props) {
     router.delete(route("project.delete-image", project.id), {
       onSuccess: () => {
         toast({
-          title: "Success",
-          description: "Project image deleted successfully",
+          title: "Berhasil",
+          description: "Gambar proyek telah dihapus.",
           variant: "success",
         });
       },
@@ -68,149 +73,168 @@ export default function Edit({ project }: Props) {
   return (
     <AuthenticatedLayout
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Edit Project "{project.name}"
-        </h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <PencilLine className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
+              Edit Proyek: {project.name}
+            </h2>
+          </div>
+          <Link href={route("project.show", project.id)}>
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Kembali
+            </Button>
+          </Link>
+        </div>
       }
     >
-      <Head title="Edit Project" />
+      <Head title={`Edit Proyek - ${project.name}`} />
 
-      <div className="py-8">
-        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-          <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-            <form
-              onSubmit={onSubmit}
-              className="space-y-6 bg-white p-4 shadow dark:bg-card sm:rounded-lg sm:p-8"
-            >
-              {/* Current Project Image */}
-              {project.image_path && (
-                <div className="space-y-2">
-                  <Label>Current Image</Label>
-                  <div className="relative w-full max-w-xl">
-                    <img
-                      src={project.image_path}
-                      alt={project.name}
-                      className="rounded-lg border"
+      <div className="py-12">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
+            <CardHeader className="space-y-1 border-b bg-muted/20 pb-6">
+              <CardTitle className="text-2xl font-black">Perbarui Proyek</CardTitle>
+              <CardDescription>
+                Sesuaikan informasi detail untuk menjaga tim Anda tetap pada jalurnya.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-8">
+              <form onSubmit={onSubmit} className="space-y-8">
+                
+                {/* Bagian Gambar */}
+                <div className="space-y-4">
+                  <Label className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <ImagePlus className="h-3.5 w-3.5 text-primary" /> Thumbnail Proyek
+                  </Label>
+                  
+                  {project.image_path && (
+                    <div className="relative group w-full max-w-md overflow-hidden rounded-xl border-2 border-dashed border-muted p-2 transition-all hover:border-primary/20">
+                      <img
+                        src={project.image_path}
+                        alt={project.name}
+                        className="rounded-lg object-cover aspect-video"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="font-bold shadow-lg"
+                          onClick={handleDeleteImage}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" /> Hapus Gambar
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <Input
+                    id="image"
+                    type="file"
+                    className="cursor-pointer h-11 pt-2 shadow-sm focus:ring-primary/20 bg-muted/10"
+                    accept=".jpg,.jpeg,.png,.webp,.svg"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setData("image", e.target.files[0]);
+                      }
+                    }}
+                  />
+                  <InputError message={errors.image} />
+                </div>
+
+                {/* Nama Proyek */}
+                <div className="space-y-3">
+                  <Label htmlFor="project_name" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <Info className="h-3.5 w-3.5 text-primary" /> Nama Proyek <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="project_name"
+                    className="h-11 shadow-sm focus:ring-primary/20"
+                    value={data.name}
+                    onChange={(e) => setData("name", e.target.value)}
+                    required
+                  />
+                  <InputError message={errors.name} />
+                </div>
+
+                {/* Deskripsi */}
+                <div className="space-y-3">
+                  <Label htmlFor="project_description" className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Deskripsi <span className="text-red-500">*</span></Label>
+                  <Textarea
+                    id="project_description"
+                    className="min-h-[120px] shadow-sm focus:ring-primary/20 leading-relaxed"
+                    value={data.description}
+                    onChange={(e) => setData("description", e.target.value)}
+                    required
+                  />
+                  <InputError message={errors.description} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Deadline */}
+                  <div className="space-y-3">
+                    <Label htmlFor="project_due_date" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5 text-primary" /> Tenggat Waktu
+                    </Label>
+                    <DateTimePicker
+                      className="w-full h-11"
+                      value={data.due_date ? new Date(data.due_date) : undefined}
+                      onChange={(date) =>
+                        setData("due_date", date ? date.toISOString() : "")
+                      }
                     />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute right-2 top-2"
-                      onClick={handleDeleteImage}
+                    <InputError message={errors.due_date} />
+                  </div>
+
+                  {/* Status */}
+                  <div className="space-y-3">
+                    <Label htmlFor="project_status" className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Status Proyek <span className="text-red-500">*</span></Label>
+                    <Select
+                      onValueChange={(value) =>
+                        setData("status", value as any)
+                      }
+                      defaultValue={data.status}
+                      required
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <SelectTrigger className="h-11 shadow-sm">
+                        <SelectValue placeholder="Pilih Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(PROJECT_STATUS_TEXT_MAP).map(
+                          ([value, label]) => (
+                            <SelectItem key={value} value={value}>
+                              {label}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <InputError message={errors.status} />
                   </div>
                 </div>
-              )}
 
-              {/* Project Image Upload */}
-              <div className="space-y-2">
-                <Label htmlFor="image">
-                  Project Image{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <Input
-                  id="image"
-                  type="file"
-                  className="cursor-pointer"
-                  accept=".jpg,.jpeg,.png,.webp,.svg"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) {
-                      setData("image", e.target.files[0]);
-                    }
-                  }}
-                />
-                <InputError message={errors.image} />
-              </div>
-
-              {/* Project Name */}
-              <div className="space-y-2">
-                <Label htmlFor="project_name">
-                  Project Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="project_name"
-                  type="text"
-                  value={data.name}
-                  onChange={(e) => setData("name", e.target.value)}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.name} className="mt-2" />
-              </div>
-
-              {/* Project Description */}
-              <div className="space-y-2">
-                <Label htmlFor="project_description">
-                  Project Description <span className="text-red-500">*</span>
-                </Label>
-                <Textarea
-                  id="project_description"
-                  value={data.description}
-                  onChange={(e) => setData("description", e.target.value)}
-                  required
-                />
-                <InputError message={errors.description} className="mt-2" />
-              </div>
-
-              {/* Project Deadline with DateTime Picker */}
-              <div className="space-y-2">
-                <Label htmlFor="project_due_date">
-                  Project Deadline{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <DateTimePicker
-                  className="w-full"
-                  value={data.due_date ? new Date(data.due_date) : undefined}
-                  onChange={(date) =>
-                    setData("due_date", date ? date.toISOString() : "")
-                  }
-                />
-                <InputError message={errors.due_date} className="mt-2" />
-              </div>
-
-              {/* Project Status */}
-              <div className="space-y-2">
-                <Label htmlFor="project_status">
-                  Project Status <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) =>
-                    setData(
-                      "status",
-                      value as "completed" | "pending" | "in_progress",
-                    )
-                  }
-                  defaultValue={data.status}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(PROJECT_STATUS_TEXT_MAP).map(
-                      ([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ),
-                    )}
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.status} className="mt-2" />
-              </div>
-
-              {/* Actions */}
-              <div className="flex justify-end space-x-4">
-                <Link href={route("project.index")}>
-                  <Button variant="secondary">Cancel</Button>
-                </Link>
-                <Button type="submit">Submit</Button>
-              </div>
-            </form>
-          </div>
+                {/* Tombol Aksi */}
+                <div className="flex items-center justify-end gap-3 border-t pt-8">
+                  <Link href={route("project.show", project.id)}>
+                    <Button type="button" variant="ghost" className="font-semibold">
+                      Batal
+                    </Button>
+                  </Link>
+                  <Button 
+                    type="submit" 
+                    size="lg"
+                    className="px-8 font-black shadow-lg shadow-primary/20 transition-all active:scale-95"
+                    disabled={processing}
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {processing ? "Menyimpan..." : "SIMPAN PERUBAHAN"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AuthenticatedLayout>

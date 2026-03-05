@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import InputError from "@/Components/InputError";
 import { useToast } from "@/hooks/use-toast";
 import { DateTimePicker } from "@/Components/ui/time-picker/date-time-picker";
@@ -18,9 +19,8 @@ import { Task } from "@/types/task";
 import { PaginatedUser } from "@/types/user";
 import MultipleSelector, { Option } from "@/Components/ui/multiple-selector";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
-import { Info, Trash2 } from "lucide-react";
+import { Info, Trash2, PencilLine, ImagePlus, Tag, AlignLeft, Calendar, Flag, UserCircle, Layers, ArrowLeft, Save } from "lucide-react";
 import { TaskLabelBadgeVariant } from "@/utils/constants";
-import axios from "axios";
 import { useState } from "react";
 import RichTextEditor from "@/Components/RichTextEditor";
 
@@ -46,7 +46,7 @@ export default function Edit({
   canChangeAssignee,
   statusOptions,
 }: Props) {
-  const { data, setData, post, errors } = useForm({
+  const { data, setData, post, errors, processing } = useForm({
     image: null as File | null,
     name: task.name || "",
     description: task.description || "",
@@ -77,8 +77,6 @@ export default function Edit({
 
   const searchLabels = async (query: string): Promise<Option[]> => {
     if (!data.project_id) return [];
-
-    // Return filtered labels immediately (no API call needed)
     return labelOptions.filter((label) =>
       label.label.toLowerCase().includes(query.toLowerCase()),
     );
@@ -88,15 +86,10 @@ export default function Edit({
 
   const getAssignedUserDisplay = (assignedUserId: string, users: PaginatedUser) => {
     if (!assignedUserId || assignedUserId === "unassigned") {
-      return "Unassigned";
+      return "Belum Ditugaskan";
     }
-
     const assignedUser = users?.data.find((u) => u.id.toString() === assignedUserId);
-
-    if (!assignedUser) {
-      return "Unassigned";
-    }
-
+    if (!assignedUser) return "Belum Ditugaskan";
     return `${assignedUser.name} (${assignedUser.email})`;
   };
 
@@ -104,8 +97,8 @@ export default function Edit({
     router.delete(route("task.delete-image", task.id), {
       onSuccess: () => {
         toast({
-          title: "Success",
-          description: "Task image deleted successfully",
+          title: "Berhasil",
+          description: "Gambar tugas telah dihapus.",
           variant: "success",
         });
       },
@@ -114,16 +107,21 @@ export default function Edit({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     post(route("task.update", task.id), {
       preserveState: true,
+      onSuccess: () => {
+        toast({
+          title: "Berhasil",
+          description: "Tugas telah diperbarui.",
+          variant: "success",
+        });
+      },
       onError: (error) => {
         const errorMessage = Object.values(error).join(" ");
         toast({
-          title: "Failed to update task",
+          title: "Gagal memperbarui tugas",
           variant: "destructive",
           description: errorMessage,
-          duration: 5000,
         });
       },
     });
@@ -132,262 +130,271 @@ export default function Edit({
   return (
     <AuthenticatedLayout
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Edit Task "{task.name}"
-        </h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <PencilLine className="h-6 w-6 text-primary" />
+            <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
+              Edit Tugas: {task.name}
+            </h2>
+          </div>
+          <Button variant="ghost" size="sm" className="gap-2" onClick={() => window.history.back()}>
+            <ArrowLeft className="h-4 w-4" />
+            Kembali
+          </Button>
+        </div>
       }
     >
-      <Head title="Tasks" />
+      <Head title={`Edit Tugas - ${task.name}`} />
 
       <div className="py-8">
-        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-          <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-            <form
-              onSubmit={onSubmit}
-              className="space-y-6 bg-white p-4 shadow dark:bg-card sm:rounded-lg sm:p-8"
-            >
-              {/* Display Existing Task Image */}
-              {task.image_path && (
-                <div className="space-y-2">
-                  <Label>Current Image</Label>
-                  <div className="relative w-full max-w-xl">
-                    <img
-                      src={task.image_path}
-                      alt={task.name}
-                      className="rounded-lg border"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute right-2 top-2"
-                      onClick={handleDeleteImage}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
+            <CardHeader className="border-b bg-muted/20 pb-6">
+              <CardTitle className="text-2xl font-black">Detail Perubahan</CardTitle>
+              <CardDescription>
+                Sesuaikan informasi tugas untuk menjaga progres tim tetap berjalan lancar.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-8">
+              <form onSubmit={onSubmit} className="space-y-8">
+                
+                {/* Gambar Tugas Saat Ini */}
+                {task.image_path && (
+                  <div className="space-y-3">
+                    <Label className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                      <ImagePlus className="h-3.5 w-3.5 text-primary" /> Lampiran Saat Ini
+                    </Label>
+                    <div className="relative group w-full max-w-md overflow-hidden rounded-xl border-2 border-dashed border-muted p-2 transition-all hover:border-primary/20">
+                      <img
+                        src={task.image_path}
+                        alt={task.name}
+                        className="rounded-lg object-cover aspect-video"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="font-black shadow-lg"
+                          onClick={handleDeleteImage}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" /> HAPUS GAMBAR
+                        </Button>
+                      </div>
+                    </div>
                   </div>
+                )}
+
+                {/* Pemilihan Proyek (Disabled) */}
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <Layers className="h-3.5 w-3.5 text-primary" /> Proyek Terkait
+                  </Label>
+                  <Select
+                    defaultValue={data.project_id.toString()}
+                    disabled={true}
+                  >
+                    <SelectTrigger className="h-11 bg-muted/50 border-dashed cursor-not-allowed">
+                      <SelectValue placeholder="Pilih Proyek" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.data.map((project) => (
+                        <SelectItem key={project.id} value={project.id.toString()}>
+                          {project.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
 
-              {/* Project Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="task_project_id">
-                  Project <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) => setData("project_id", value)}
-                  defaultValue={data.project_id.toString()}
-                  disabled={true}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {projects.data.map((project) => (
-                      <SelectItem key={project.id} value={project.id.toString()}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.project_id} className="mt-2" />
-              </div>
-
-              {/* Task Image */}
-              <div>
-                <Label htmlFor="task_image_path">
-                  Task Image{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <Input
-                  id="task_image_path"
-                  type="file"
-                  className="mt-1 block w-full"
-                  accept=".jpg,.jpeg,.png,.webp,.svg"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setData("image", e.target.files[0]);
-                    }
-                  }}
-                />
-                <InputError message={errors.image} className="mt-2" />
-              </div>
-
-              {/* Task Name */}
-              <div className="space-y-2">
-                <Label htmlFor="task_name">
-                  Task Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="task_name"
-                  type="text"
-                  placeholder="Enter a task name"
-                  value={data.name}
-                  onChange={(e) => setData("name", e.target.value)}
-                  required
-                  autoFocus
-                />
-                <InputError message={errors.name} className="mt-2" />
-              </div>
-
-              {/* Task Labels */}
-              <div className="space-y-2">
-                <Label htmlFor="task_labels">
-                  Task Labels{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                {labels.data.length > 0 ? (
-                  <MultipleSelector
-                    value={selectedLabels}
-                    defaultOptions={labelOptions}
-                    placeholder="Select labels..."
-                    emptyIndicator="No labels found"
-                    onSearch={searchLabels}
-                    triggerSearchOnFocus
-                    onChange={(selectedLabels) => {
-                      setSelectedLabels(selectedLabels);
-                      setData(
-                        "label_ids",
-                        selectedLabels.map((label) => Number(label.value)),
-                      );
+                {/* Input Gambar Baru */}
+                <div className="space-y-3">
+                  <Label htmlFor="task_image_path" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <ImagePlus className="h-3.5 w-3.5 text-primary" /> Ganti Gambar <span className="text-[9px] font-normal text-muted-foreground lowercase">(opsional)</span>
+                  </Label>
+                  <Input
+                    id="task_image_path"
+                    type="file"
+                    className="cursor-pointer h-11 pt-2 shadow-sm bg-muted/10"
+                    accept=".jpg,.jpeg,.png,.webp,.svg"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setData("image", e.target.files[0]);
+                      }
                     }}
                   />
-                ) : (
-                  <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertTitle>No labels found</AlertTitle>
-                    <AlertDescription className="mb-1">
-                      If you want to label your tasks, please create labels from the
-                      button below.
-                    </AlertDescription>
-                    <Link
-                      href={route("task_labels.create", {
-                        project_id: data.project_id,
-                      })}
+                  <InputError message={errors.image} />
+                </div>
+
+                {/* Nama Tugas */}
+                <div className="space-y-3">
+                  <Label htmlFor="task_name" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <AlignLeft className="h-3.5 w-3.5 text-primary" /> Nama Tugas <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="task_name"
+                    placeholder="Masukkan nama tugas..."
+                    className="h-11 shadow-sm focus:ring-primary/20"
+                    value={data.name}
+                    onChange={(e) => setData("name", e.target.value)}
+                    required
+                  />
+                  <InputError message={errors.name} />
+                </div>
+
+                {/* Label Tugas */}
+                <div className="space-y-3">
+                  <Label htmlFor="task_labels" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <Tag className="h-3.5 w-3.5 text-primary" /> Label Tugas
+                  </Label>
+                  {labels.data.length > 0 ? (
+                    <MultipleSelector
+                      value={selectedLabels}
+                      defaultOptions={labelOptions}
+                      placeholder="Pilih label..."
+                      emptyIndicator={<span className="text-xs italic p-2">Label tidak ditemukan</span>}
+                      onSearch={searchLabels}
+                      triggerSearchOnFocus
+                      className="min-h-11 shadow-sm"
+                      onChange={(labels) => {
+                        setSelectedLabels(labels);
+                        setData("label_ids", labels.map((l) => Number(l.value)));
+                      }}
+                    />
+                  ) : (
+                    <Alert className="bg-primary/5 border-primary/10">
+                      <Info className="h-4 w-4 text-primary" />
+                      <AlertTitle className="font-bold">Belum ada label</AlertTitle>
+                      <AlertDescription className="flex items-center justify-between gap-4">
+                        <span>Buat label terlebih dahulu untuk mengkategorikan tugas ini.</span>
+                        <Link href={route("task_labels.create", { project_id: data.project_id })}>
+                          <Button variant="outline" size="sm" className="font-bold">BUAT LABEL</Button>
+                        </Link>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+
+                {/* Deskripsi */}
+                <div className="space-y-3">
+                  <Label htmlFor="task_description" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <AlignLeft className="h-3.5 w-3.5 text-primary" /> Deskripsi Lengkap
+                  </Label>
+                  <div className="rounded-md border shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                    <RichTextEditor
+                      value={data.description}
+                      onChange={(content) => setData("description", content)}
+                    />
+                  </div>
+                  <InputError message={errors.description} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Deadline */}
+                  <div className="space-y-3">
+                    <Label htmlFor="task_due_date" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5 text-primary" /> Tenggat Waktu
+                    </Label>
+                    <DateTimePicker
+                      className="w-full h-11"
+                      value={data.due_date ? new Date(data.due_date) : undefined}
+                      onChange={(date) => setData("due_date", date ? date.toISOString() : "")}
+                    />
+                    <InputError message={errors.due_date} />
+                  </div>
+
+                  {/* Status */}
+                  <div className="space-y-3">
+                    <Label htmlFor="task_status" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                      <Layers className="h-3.5 w-3.5 text-primary" /> Status <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value) => setData("status_id", value)}
+                      value={data.status_id}
+                      required
                     >
-                      <Button variant="secondary">Create Label</Button>
-                    </Link>
-                  </Alert>
-                )}
-              </div>
+                      <SelectTrigger className="h-11 shadow-sm">
+                        <SelectValue placeholder="Pilih Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map(({ value, label }) => (
+                          <SelectItem key={value} value={value.toString()}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <InputError message={errors.status_id} />
+                  </div>
 
-              {/* Task Description */}
-              <div className="space-y-2">
-                <Label htmlFor="task_description">
-                  Task Description{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <RichTextEditor
-                  value={data.description}
-                  onChange={(content) => setData("description", content)}
-                />
-                <InputError message={errors.description} className="mt-2" />
-              </div>
+                  {/* Prioritas */}
+                  <div className="space-y-3">
+                    <Label htmlFor="task_priority" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                      <Flag className="h-3.5 w-3.5 text-primary" /> Prioritas <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value) => setData("priority", value as any)}
+                      defaultValue={data.priority}
+                      required
+                    >
+                      <SelectTrigger className="h-11 shadow-sm">
+                        <SelectValue placeholder="Pilih Urgensi" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Rendah (Low)</SelectItem>
+                        <SelectItem value="medium">Sedang (Medium)</SelectItem>
+                        <SelectItem value="high">Tinggi (High)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <InputError message={errors.priority} />
+                  </div>
+                </div>
 
-              {/* Task Deadline */}
-              <div className="space-y-2">
-                <Label htmlFor="task_due_date">
-                  Task Deadline{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <DateTimePicker
-                  className="w-full"
-                  value={data.due_date ? new Date(data.due_date) : undefined}
-                  onChange={(date) =>
-                    setData("due_date", date ? date.toISOString() : "")
-                  }
-                />
-                <InputError message={errors.due_date} className="mt-2" />
-              </div>
+                {/* Penanggung Jawab */}
+                <div className="space-y-3">
+                  <Label htmlFor="task_assigned_user" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
+                    <UserCircle className="h-3.5 w-3.5 text-primary" /> Ditugaskan Kepada
+                  </Label>
+                  <Select
+                    onValueChange={(value) => setData("assigned_user_id", value === "unassigned" ? "" : value)}
+                    value={data.assigned_user_id || "unassigned"}
+                    disabled={!canChangeAssignee}
+                  >
+                    <SelectTrigger className={`h-11 shadow-sm ${!canChangeAssignee ? 'bg-muted/50 border-dashed cursor-not-allowed' : ''}`}>
+                      <SelectValue>
+                        {getAssignedUserDisplay(data.assigned_user_id, users)}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassigned">Belum Ditugaskan</SelectItem>
+                      {users?.data.map((user) => (
+                        <SelectItem key={user.id} value={user.id.toString()}>
+                          {user.name} ({user.email})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <InputError message={errors.assigned_user_id} />
+                </div>
 
-              {/* Task Status */}
-              <div className="space-y-2">
-                <Label htmlFor="task_status">
-                  Task Status <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) => setData("status_id", value)}
-                  value={data.status_id}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map(({ value, label }) => (
-                      <SelectItem key={value} value={value.toString()}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.status_id} className="mt-2" />
-              </div>
-
-              {/* Task Priority */}
-              <div className="space-y-2">
-                <Label htmlFor="task_priority">
-                  Task Priority <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) =>
-                    setData("priority", value as "low" | "medium" | "high")
-                  }
-                  defaultValue={data.priority}
-                  required
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.priority} className="mt-2" />
-              </div>
-
-              {/* Assigned User */}
-              <div className="space-y-2">
-                <Label htmlFor="task_assigned_user">
-                  Assigned User{" "}
-                  <span className="text-muted-foreground">(Optional)</span>
-                </Label>
-                <Select
-                  onValueChange={(value) =>
-                    setData("assigned_user_id", value === "unassigned" ? "" : value)
-                  }
-                  value={data.assigned_user_id || "unassigned"}
-                  disabled={!canChangeAssignee}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {getAssignedUserDisplay(data.assigned_user_id, users)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="unassigned">Unassigned</SelectItem>
-                    {users?.data.map((user) => (
-                      <SelectItem key={user.id} value={user.id.toString()}>
-                        {user.name} ({user.email})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.assigned_user_id} className="mt-2" />
-              </div>
-
-              {/* Actions */}
-              <div className="flex justify-end space-x-4">
-                <Link href={route("task.index")}>
-                  <Button variant="secondary">Cancel</Button>
-                </Link>
-                <Button type="submit">Submit</Button>
-              </div>
-            </form>
-          </div>
+                {/* Tombol Aksi */}
+                <div className="flex items-center justify-end gap-3 border-t pt-8">
+                  <Link href={route("task.index")}>
+                    <Button type="button" variant="ghost" className="font-semibold">
+                      Batalkan
+                    </Button>
+                  </Link>
+                  <Button 
+                    type="submit" 
+                    size="lg"
+                    className="px-8 font-black shadow-lg shadow-primary/20 transition-all active:scale-95"
+                    disabled={processing}
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {processing ? "Menyimpan..." : "SIMPAN PERUBAHAN"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </AuthenticatedLayout>

@@ -9,8 +9,15 @@ import {
   TASK_STATUS_BADGE_MAP,
 } from "@/utils/constants";
 import { Link } from "@inertiajs/react";
-
-import { ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { 
+  ChevronRight, 
+  Pencil, 
+  Plus, 
+  Trash2, 
+  FolderKanban, 
+  Hash,
+  AlertTriangle
+} from "lucide-react";
 
 type TaskHeaderProps = {
   task: Task;
@@ -21,66 +28,87 @@ export function TaskHeader({ task }: TaskHeaderProps) {
 
   const handleDelete = () => {
     showConfirmation({
-      title: "Delete Task",
+      title: "Hapus Tugas",
       description:
-        "Are you sure you want to delete this task? This action cannot be undone.",
+        "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan dan semua data terkait akan hilang.",
       action: () => router.delete(route("task.destroy", task.id)),
-      actionText: "Delete",
+      actionText: "Ya, Hapus",
+      variant: "destructive",
     });
   };
 
   return (
-    <div className="space-y-4 rounded-lg border bg-card p-4 shadow-sm sm:p-6">
-      <div className="flex items-center gap-x-3 text-sm text-muted-foreground">
+    <div className="space-y-6 rounded-2xl border bg-card/50 p-5 shadow-sm backdrop-blur-sm sm:p-8 overflow-hidden relative">
+      {/* Background Accent */}
+      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
+
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center gap-x-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
         <Link
           href={route("project.show", task.project.id)}
-          className="hover:text-foreground hover:underline"
+          className="flex items-center gap-1.5 transition-colors hover:text-primary"
         >
+          <FolderKanban className="h-3.5 w-3.5" />
           {task.project.name}
         </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span>Task #{task.task_number}</span>
-      </div>
+        <ChevronRight className="h-3 w-3 opacity-50" />
+        <div className="flex items-center gap-1 opacity-70">
+          <Hash className="h-3 w-3" />
+          Tugas #{task.task_number}
+        </div>
+      </nav>
 
-      <div className="flex flex-col gap-5 md:justify-between lg:flex-row lg:items-center lg:gap-3">
-        <div className="flex flex-col gap-3">
-          <h1 className="text-2xl font-semibold md:text-2xl">{task.name}</h1>
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
+        <div className="space-y-4">
+          {/* Task Title */}
+          <h1 className="text-3xl font-black tracking-tight text-foreground md:text-4xl italic">
+            {task.name}
+          </h1>
 
-          <div className="flex gap-2">
+          {/* Status & Priority Badges */}
+          <div className="flex flex-wrap gap-2">
             <Badge
               variant={TASK_STATUS_BADGE_MAP(task.status.slug, task.status.color)}
+              className="px-3 py-1 font-bold shadow-sm"
             >
               {task.status.name}
             </Badge>
-            <Badge variant={TASK_PRIORITY_BADGE_MAP[task.priority]}>
+            <Badge 
+              variant={TASK_PRIORITY_BADGE_MAP[task.priority]}
+              className="px-3 py-1 font-bold shadow-sm uppercase text-[10px]"
+            >
               {TASK_PRIORITY_TEXT_MAP[task.priority]}
             </Badge>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <Link href={route("task.create", { project_id: task.project_id })}>
-            <Button variant="secondary" className="w-full md:w-auto">
-              <Plus className="h-3 w-3" />
-              <span>New Task</span>
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-3 pt-2 lg:pt-0">
+          <Link href={route("task.create", { project_id: task.project_id })} className="w-full sm:w-auto">
+            <Button size="sm" className="w-full font-bold shadow-lg shadow-primary/20 sm:w-auto">
+              <Plus className="mr-2 h-4 w-4" />
+              Tugas Baru
             </Button>
           </Link>
+          
           {task.can.edit && (
-            <Link href={route("task.edit", task.id)}>
-              <Button variant="outline" className="w-full md:w-auto">
-                <Pencil className="h-3 w-3" />
-                <span>Edit Task</span>
+            <Link href={route("task.edit", task.id)} className="w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="w-full font-bold border-primary/20 hover:bg-primary/5 sm:w-auto">
+                <Pencil className="mr-2 h-4 w-4 text-primary" />
+                Edit
               </Button>
             </Link>
           )}
+          
           {task.can.delete && (
             <Button
-              variant="outline"
-              className="w-full text-red-500 md:w-auto"
+              variant="ghost"
+              size="sm"
+              className="w-full font-bold text-destructive hover:bg-destructive/10 sm:w-auto"
               onClick={handleDelete}
             >
-              <Trash2 className="h-3 w-3" />
-              <span>Delete Task</span>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Hapus
             </Button>
           )}
         </div>

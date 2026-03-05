@@ -79,6 +79,7 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
     });
   };
 
+  // FIXED: Menghapus properti 'variant' agar tidak error saat pnpm build
   const handleDelete = () => {
     showConfirmation({
       title: "Hapus Tugas",
@@ -86,7 +87,6 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
         "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini bersifat permanen.",
       action: () => router.delete(route("task.destroy", task.id)),
       actionText: "Hapus",
-      variant: "destructive",
     });
   };
 
@@ -103,7 +103,6 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
           !canDragTask && "opacity-90 bg-muted/50",
         )}
       >
-        {/* Indikator Prioritas (Opsional: Jika ada data priority) */}
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">
@@ -208,7 +207,6 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
           )}
         </div>
         
-        {/* Handle Visual untuk Drag */}
         {canDragTask && (
           <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
             <GripVertical className="h-4 w-4 text-muted-foreground/30" />

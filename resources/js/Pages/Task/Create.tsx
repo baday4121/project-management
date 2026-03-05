@@ -19,7 +19,7 @@ import { PaginatedUser } from "@/types/user";
 import MultipleSelector, { Option } from "@/Components/ui/multiple-selector";
 import { TaskLabelBadgeVariant } from "@/utils/constants";
 import axios from "axios";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import RichTextEditor from "@/Components/RichTextEditor";
 import { 
   ClipboardPlus, 
@@ -31,10 +31,8 @@ import {
   Flag, 
   UserCircle, 
   ArrowLeft,
-  Loader2,
-  CheckCircle2
+  Loader2
 } from "lucide-react";
-import _ from "lodash";
 
 type Props = {
   projects: PaginatedProject;
@@ -116,7 +114,7 @@ export default function Create({
         setKey((prev) => prev + 1);
       }
     } catch (error) {
-      console.error("Failed to fetch project labels:", error);
+      console.error("Gagal mengambil label proyek:", error);
     } finally {
       setIsLoadingLabels(false);
     }
@@ -166,7 +164,7 @@ export default function Create({
         });
       }
     } catch (error) {
-      console.error("Failed to check project role:", error);
+      console.error("Gagal memeriksa peran proyek:", error);
     }
   };
 
@@ -176,8 +174,13 @@ export default function Create({
       const response = await axios.get(route("task.users", projectId));
       setUsers(response.data.users || { data: [] });
     } catch (error) {
-      console.error("Failed to fetch project users:", error);
+      console.error("Gagal mengambil pengguna proyek:", error);
       setUsers({ data: [] });
+      toast({
+        title: "Error",
+        description: "Gagal mengambil daftar pengguna proyek",
+        variant: "destructive",
+      });
     } finally {
       setIsLoadingUsers(false);
     }
@@ -191,7 +194,7 @@ export default function Create({
         setStatusOptions(response.data.statusOptions);
       }
     } catch (error) {
-      console.error("Failed to fetch project statuses:", error);
+      console.error("Gagal mengambil status proyek:", error);
     } finally {
       setIsLoadingStatuses(false);
     }
@@ -215,7 +218,7 @@ export default function Create({
       ]);
       setShowFields(true);
     } catch (error) {
-      console.error("Failed to fetch project data:", error);
+      console.error("Gagal memuat data proyek:", error);
     }
   };
 
@@ -258,7 +261,7 @@ export default function Create({
               <CardDescription>
                 {data.project_id 
                   ? `Menambahkan tugas untuk proyek: ${projects.data.find((p) => p.id.toString() === data.project_id)?.name}`
-                  : "Silakan pilih proyek terlebih dahulu untuk memulai."}
+                  : "Pilih proyek terlebih dahulu untuk memulai pengisian detail tugas."}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-8">
@@ -295,7 +298,7 @@ export default function Create({
                     {/* Nama Tugas */}
                     <div className="space-y-3">
                       <Label htmlFor="task_name" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-primary" /> Nama Tugas <span className="text-red-500">*</span>
+                        <AlignLeft className="h-3.5 w-3.5 text-primary" /> Nama Tugas <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="task_name"

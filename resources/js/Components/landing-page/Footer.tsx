@@ -120,11 +120,11 @@ export const Footer = () => {
       <div className="mt-16 border-t pt-8">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} **WorkDei Solutions**. Seluruh hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} WorkDei - Seluruh hak cipta dilindungi.
           </p>
           <p className="text-sm text-muted-foreground">
-            Dikembangkan dengan penuh dedikasi oleh{" "}
-            <span className="font-semibold text-primary">Ari Gunawan</span>
+            Dikembangkan dengan penuh cinta oleh{" "}
+            <span className="font-semibold text-primary">Baday</span>
           </p>
         </div>
       </div>

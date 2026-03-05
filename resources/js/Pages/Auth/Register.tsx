@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/Components/ui/card";
-import { LogIn } from "lucide-react";
+import { UserPlus, User, Mail, Lock } from "lucide-react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { Separator } from "@/Components/ui/separator";
 import PasswordStrengthMeter from "@/Components/PasswordStrengthMeter";
@@ -53,55 +53,79 @@ export default function Register() {
 
   return (
     <AuthFlowLayout>
-      <Head title="Register" />
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>
-            Enter your details below to create your account
+      <Head title="Daftar Akun Baru" />
+      
+      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
+        <CardHeader className="space-y-1 pb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <UserPlus className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-3xl font-bold tracking-tight">Daftar Akun</CardTitle>
+          <CardDescription className="text-base text-muted-foreground">
+            Lengkapi data di bawah untuk mulai menggunakan Workdei
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={submit} className="space-y-6">
+          <form onSubmit={submit} className="space-y-5">
+            {/* Input Nama */}
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                value={data.name}
-                onChange={(e) => setData("name", e.target.value)}
-                required
-              />
-              <InputError message={errors.name} className="mt-2" />
+              <Label htmlFor="name">Nama Lengkap</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="name"
+                  placeholder="Masukkan nama Anda"
+                  className="pl-10 h-11"
+                  value={data.name}
+                  onChange={(e) => setData("name", e.target.value)}
+                  required
+                />
+              </div>
+              <InputError message={errors.name} />
             </div>
 
+            {/* Input Email */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={data.email}
-                onChange={(e) => setData("email", e.target.value)}
-                required
-              />
-              <InputError message={errors.email} className="mt-2" />
+              <Label htmlFor="email">Alamat Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="nama@email.com"
+                  className="pl-10 h-11"
+                  value={data.email}
+                  onChange={(e) => setData("email", e.target.value)}
+                  required
+                />
+              </div>
+              <InputError message={errors.email} />
             </div>
 
+            {/* Input Password */}
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={data.password}
-                onChange={(e) => setData("password", e.target.value)}
-                required
-              />
+              <Label htmlFor="password">Kata Sandi</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Buat kata sandi kuat"
+                  className="pl-10 h-11"
+                  value={data.password}
+                  onChange={(e) => setData("password", e.target.value)}
+                  required
+                />
+              </div>
+              
               <Accordion
                 type="single"
-                value={data.password.length > 0 ? "password" : ""}
+                collapsible
+                value={data.password.length > 0 ? "password-meter" : ""}
               >
-                <AccordionItem value="password" className="border-none">
-                  <AccordionContent className="pb-0">
+                <AccordionItem value="password-meter" className="border-none">
+                  <AccordionContent className="pb-0 pt-2">
                     <PasswordStrengthMeter
                       password={data.password}
                       onValidationChange={setIsPasswordValid}
@@ -109,64 +133,74 @@ export default function Register() {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              <InputError message={errors.password} className="mt-2" />
+              <InputError message={errors.password} />
             </div>
 
+            {/* Konfirmasi Password */}
             <div className="space-y-2">
-              <Label htmlFor="password_confirmation">Confirm Password</Label>
-              <Input
-                id="password_confirmation"
-                type="password"
-                value={data.password_confirmation}
-                onChange={(e) => setData("password_confirmation", e.target.value)}
-                required
-              />
-              <InputError message={errors.password_confirmation} className="mt-2" />
+              <Label htmlFor="password_confirmation">Konfirmasi Kata Sandi</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password_confirmation"
+                  type="password"
+                  placeholder="Ulangi kata sandi"
+                  className="pl-10 h-11"
+                  value={data.password_confirmation}
+                  onChange={(e) => setData("password_confirmation", e.target.value)}
+                  required
+                />
+              </div>
+              <InputError message={errors.password_confirmation} />
             </div>
 
-            <div className="space-y-3">
+            <div className="pt-2 space-y-4">
               <Button
                 type="submit"
-                className="flex w-full"
-                disabled={
-                  processing || !isPasswordValid || !data.password_confirmation
-                }
+                className="h-11 w-full text-base font-bold shadow-lg shadow-primary/20"
+                disabled={processing || !isPasswordValid || !data.password_confirmation}
               >
-                <LogIn />
-                <span>Sign up</span>
+                <span>Daftar Sekarang</span>
               </Button>
-              <Link
-                href={route("login")}
-                className="inline-block text-sm text-muted-foreground underline"
-              >
-                Already registered?
-              </Link>
 
-              <div className="flex items-center gap-4">
+              <div className="flex justify-center text-sm">
+                <span className="text-muted-foreground">Sudah punya akun?</span>
+                <Link
+                  href={route("login")}
+                  className="ml-1 font-bold text-primary hover:underline"
+                >
+                  Masuk di sini
+                </Link>
+              </div>
+
+              <div className="relative flex items-center py-2">
                 <Separator className="flex-1" />
-                <span className="text-sm uppercase tracking-widest text-muted-foreground">
-                  or
+                <span className="mx-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Atau daftar dengan
                 </span>
                 <Separator className="flex-1" />
               </div>
-              <Button
-                variant="outline"
-                className="w-full"
-                type="button"
-                onClick={() => handleSocialLogin("google")}
-              >
-                <FaGoogle />
-                <span>Sign in with Google</span>
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                className="w-full"
-                onClick={() => handleSocialLogin("github")}
-              >
-                <FaGithub />
-                <span>Sign in with Github</span>
-              </Button>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-11 font-medium"
+                  type="button"
+                  onClick={() => handleSocialLogin("google")}
+                >
+                  <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
+                  Google
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-11 font-medium"
+                  type="button"
+                  onClick={() => handleSocialLogin("github")}
+                >
+                  <FaGithub className="mr-2 h-4 w-4" />
+                  Github
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

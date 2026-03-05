@@ -1,76 +1,52 @@
 <div align="center">
-  <img src="public/logo.svg" alt="Workdei Logo" width="80">
+  <img src="public/logo.svg" alt="Workdei Logo" width="120">
   
   # Workdei
+  
+  ### *Build the future, together.*
+
+  [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+  [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org)
+  [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+  [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+  **Workdei** adalah aplikasi manajemen proyek modern yang dirancang untuk membantu tim berkolaborasi secara efisien melalui manajemen tugas yang intuitif dan komunikasi real-time.
 </div>
 
-<p align="center">A modern project management application built with Laravel and React, designed to help teams collaborate efficiently through intuitive task management and real-time communication.</p>
+---
 
-## ✨ Features
+## ✨ Fitur Utama
 
-### 📊 Project Management
+### 📊 Manajemen Proyek
+- **Multi-Project Hub:** Kelola berbagai proyek dalam satu dasbor terpusat.
+- **Role-Based Access:** Sistem peran fleksibel (Admin, Project Manager, Member).
+- **Statistik Real-time:** Pantau progres melalui grafik dan analitik yang diperbarui secara instan.
+- **Tracking Status:** Alur kerja terorganisir (Pending, In Progress, Completed).
 
-- Create and manage multiple projects
-- Track project progress and completion status
-- Invite team members with role-based permissions (Project Manager, Project Member)
-- Real-time project statistics and analytics
-- Project status tracking (Pending, In Progress, Completed)
+### ✅ Manajemen Tugas (Kanban & List)
+- **Drag & Drop Kanban:** Pindahkan tugas antar kolom status dengan mulus.
+- **Prioritas & Label:** Kategorikan tugas berdasarkan urgensi dan label kustom.
+- **Threaded Comments:** Diskusi terpadu langsung di dalam setiap kartu tugas.
+- **Smart Filtering:** Cari dan urutkan tugas berdasarkan PIC, tenggat, atau label.
 
-### ✅ Task Management
+### 🎨 User Experience
+- **Glassmorphism UI:** Tampilan modern, bersih, dan premium.
+- **Dark/Light Mode:** Dukungan penuh untuk kenyamanan mata pengguna.
+- **Responsive Design:** Optimal di desktop maupun perangkat mobile.
+- **Instant Notifications:** Pemberitahuan real-time melalui WebSockets.
 
-- Create, assign, and track tasks within projects
-- Task categorization with customizable labels
-- Task prioritization (Low, Medium, High)
-- Task status tracking (Pending, In Progress, Completed)
-- Task discussions with threaded comments
-- Task filtering and sorting capabilities
 
-### 👥 Team Collaboration
-
-- Role-based access control
-- Project member invitation system
-- Real-time notifications for project updates
-- Task assignment and reassignment
-- Team member management
-- Collaborative task discussions
-
-### 🎨 User Interface
-
-- Modern, responsive design
-- Dark/Light theme support
-- Intuitive navigation
-- Real-time updates
-- Dashboard with project and task overview
-- Filtering and sorting capabilities
-
-### 🔐 Authentication
-
-- Traditional email/password authentication
-- Social login support:
-  - GitHub authentication
-  - Google authentication
-- Password reset functionality
-- Email verification
 
 ## 🛠️ Tech Stack
 
-### 🔧 Backend
+| Backend | Frontend |
+| :--- | :--- |
+| **Framework:** Laravel 11.x | **Library:** React with TypeScript |
+| **Database:** MySQL | **State/SPA:** Inertia.js |
+| **Real-time:** Laravel Reverb | **Styling:** TailwindCSS & Shadcn UI |
+| **Auth:** Laravel Sanctum & Socialite | **Icons:** Lucide Icons |
 
-- PHP 8.x
-- Laravel 11.x
-- MySQL
-- Laravel Sanctum for authentication
-- Spatie Permissions for role management
-- Real-time notifications with Laravel Reverb
-
-### 🎯 Frontend
-
-- React with TypeScript
-- Inertia.js for SPA-like experience
-- TailwindCSS for styling
-- Shadcn UI components
-- Lucide icons
-- Real-time updates with WebSockets
+---
 
 ## 📥 Installation
 

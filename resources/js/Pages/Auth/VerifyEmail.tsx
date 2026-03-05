@@ -3,7 +3,7 @@ import AuthFlowLayout from "@/Layouts/AuthFlowLayout";
 import { Button } from "@/Components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { FormEventHandler } from "react";
-import { Mail, LogOut } from "lucide-react";
+import { Mail, LogOut, Send, CheckCircle2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,11 +21,11 @@ export default function VerifyEmail({ status }: { status?: string }) {
     e.preventDefault();
 
     post(route("verification.send"), {
-      onSuccess: () => {
+      onFinish: () => {
         toast({
-          title: "Verification email sent",
+          title: "Email Terkirim",
           variant: "success",
-          description: "A new verification link has been sent to your email.",
+          description: "Tautan verifikasi baru telah dikirim ke alamat email Anda.",
           duration: 5000,
         });
       },
@@ -34,43 +34,56 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
   return (
     <AuthFlowLayout>
-      <Head title="Email Verification" />
+      <Head title="Verifikasi Email" />
 
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Verify Email</CardTitle>
-          <CardDescription>
-            Thanks for signing up! Please verify your email address to continue.
+      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5 bg-card/80 backdrop-blur-sm">
+        <CardHeader className="space-y-1 pb-6 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
+            <Mail className="h-7 w-7" />
+          </div>
+          <CardTitle className="text-3xl font-black tracking-tight">Verifikasi Email</CardTitle>
+          <CardDescription className="text-base">
+            Terima kasih telah mendaftar! Satu langkah lagi untuk memulai.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            We've sent a verification link to your email address. If you haven't
-            received the email, click below to request a new one.
-          </p>
+
+        <CardContent className="space-y-6">
+          <div className="rounded-xl border border-primary/10 bg-primary/5 p-4">
+            <p className="text-sm leading-relaxed text-muted-foreground text-center">
+              Kami telah mengirimkan tautan verifikasi ke alamat email Anda. 
+              Harap periksa kotak masuk (atau folder spam) Anda untuk mengaktifkan akun.
+            </p>
+          </div>
 
           {status === "verification-link-sent" && (
-            <p className="text-sm font-medium text-green-600 dark:text-green-400">
-              A new verification link has been sent to your email address.
-            </p>
+            <div className="flex items-center justify-center gap-2 rounded-lg bg-emerald-500/10 p-3 text-sm font-bold text-emerald-600 dark:text-emerald-400 animate-in fade-in zoom-in-95">
+              <CheckCircle2 className="h-4 w-4" />
+              Tautan baru telah berhasil dikirim!
+            </div>
           )}
 
           <form onSubmit={submit}>
-            <Button type="submit" className="w-full" disabled={processing}>
-              <Mail className="h-4 w-4" />
-              Resend Verification Email
+            <Button 
+              type="submit" 
+              className="h-11 w-full font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" 
+              disabled={processing}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {processing ? "Mengirim ulang..." : "Kirim Ulang Email Verifikasi"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-end border-t pt-4">
+
+        <CardFooter className="flex flex-col items-center gap-4 border-t bg-muted/30 py-6">
+          <p className="text-xs text-muted-foreground">Salah memasukkan email atau ingin keluar?</p>
           <Link
             href={route("logout")}
             method="post"
             as="button"
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground hover:underline"
+            className="flex items-center gap-2 text-sm font-bold text-destructive hover:opacity-80 transition-opacity"
           >
             <LogOut className="h-4 w-4" />
-            Log Out
+            Keluar dari Akun
           </Link>
         </CardFooter>
       </Card>

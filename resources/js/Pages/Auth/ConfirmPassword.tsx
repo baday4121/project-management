@@ -10,6 +10,14 @@ import {
   AccordionContent,
   AccordionItem,
 } from "@/Components/ui/accordion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/Components/ui/card";
+import { ShieldCheck, LockKeyhole } from "lucide-react";
 import PasswordStrengthMeter from "@/Components/PasswordStrengthMeter";
 import React from "react";
 
@@ -30,48 +38,66 @@ export default function ConfirmPassword() {
 
   return (
     <AuthFlowLayout>
-      <Head title="Confirm Password" />
+      <Head title="Konfirmasi Kata Sandi" />
 
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        This is a secure area of the application. Please confirm your password before
-        continuing.
-      </div>
+      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5 bg-card/80 backdrop-blur-sm">
+        <CardHeader className="space-y-1 pb-6 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner">
+            <ShieldCheck className="h-7 w-7" />
+          </div>
+          <CardTitle className="text-3xl font-black tracking-tight">Area Amankan</CardTitle>
+          <CardDescription className="text-base leading-relaxed">
+            Ini adalah area aman. Harap konfirmasi kata sandi Anda sebelum melanjutkan.
+          </CardDescription>
+        </CardHeader>
 
-      <form
-        onSubmit={submit}
-        className="space-y-6 rounded-lg bg-white p-4 shadow dark:bg-card sm:p-8"
-      >
-        <div>
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={data.password}
-            onChange={(e) => setData("password", e.target.value)}
-            required
-          />
-          <Accordion
-            type="single"
-            value={data.password.length > 0 ? "password" : ""}
-          >
-            <AccordionItem value="password" className="border-none">
-              <AccordionContent className="pb-0">
-                <PasswordStrengthMeter
-                  password={data.password}
-                  onValidationChange={setIsPasswordValid}
+        <CardContent>
+          <form onSubmit={submit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="password" className="font-bold">Kata Sandi</Label>
+              <div className="relative">
+                <LockKeyhole className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="Masukkan kata sandi Anda"
+                  className="h-11 pl-10 focus:ring-primary/20 shadow-sm"
+                  value={data.password}
+                  onChange={(e) => setData("password", e.target.value)}
+                  autoFocus
+                  required
                 />
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-          <InputError message={errors.password} className="mt-2" />
-        </div>
+              </div>
+              
+              <Accordion
+                type="single"
+                collapsible
+                value={data.password.length > 0 ? "password-meter" : ""}
+                className="w-full"
+              >
+                <AccordionItem value="password-meter" className="border-none">
+                  <AccordionContent className="pb-0 pt-2">
+                    <PasswordStrengthMeter
+                      password={data.password}
+                      onValidationChange={setIsPasswordValid}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              <InputError message={errors.password} />
+            </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={processing || !isPasswordValid}>
-            Confirm
-          </Button>
-        </div>
-      </form>
+            <Button 
+              type="submit" 
+              className="h-11 w-full font-black shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" 
+              disabled={processing || !isPasswordValid}
+            >
+              {processing ? "Memverifikasi..." : "KONFIRMASI SEKARANG"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </AuthFlowLayout>
   );
 }

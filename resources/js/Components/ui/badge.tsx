@@ -23,7 +23,7 @@ export const badgeVariants = cva(
         red: "border-red-500 bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-200 dark:border-red-300",
         green:
           "border-green-500 bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-200 dark:border-green-300",
-        blue: "border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-300",
+        purple: "border-purple-500 bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-300",
         yellow:
           "border-yellow-500 bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-300",
         amber:

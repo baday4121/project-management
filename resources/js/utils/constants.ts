@@ -97,7 +97,7 @@ export const TASK_PRIORITY_TEXT_MAP = {
 export const TASK_LABEL_BADGE_VARIANTS = {
   red: "red",
   green: "green",
-  blue: "blue",
+  purple: "purple",
   yellow: "yellow",
   amber: "amber",
   indigo: "indigo",
@@ -113,7 +113,7 @@ export type TaskLabelBadgeVariant = keyof typeof TASK_LABEL_BADGE_VARIANTS;
 export const TASK_LABEL_BADGE_VARIANT_MAP: Record<TaskLabelBadgeVariant, string> = {
   red: "red",
   green: "green",
-  blue: "blue",
+  purple: "purple",
   yellow: "yellow",
   amber: "amber",
   indigo: "indigo",

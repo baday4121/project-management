@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="public/logo.svg" alt="Workdei Logo" width="120">
+  <img src="public/logo.svg" alt="WorkDei Logo" width="120">
   
-  # Workdei
+  # WorkDei
   
   ### *Build the future, together.*
 
@@ -10,7 +10,7 @@
   [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
   [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-  **Workdei** adalah aplikasi manajemen proyek modern yang dirancang untuk membantu tim berkolaborasi secara efisien melalui manajemen tugas yang intuitif dan komunikasi real-time.
+  **WorkDei** adalah aplikasi manajemen proyek modern yang dirancang untuk membantu tim berkolaborasi secara efisien melalui manajemen tugas yang intuitif dan komunikasi real-time.
 </div>
 
 ---

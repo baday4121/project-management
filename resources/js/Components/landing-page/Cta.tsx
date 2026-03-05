@@ -23,7 +23,7 @@ export const Cta = () => {
               </span>
             </h2>
             <p className="mt-6 max-w-2xl text-xl leading-relaxed text-muted-foreground">
-              Bergabunglah dengan ratusan tim yang telah menggunakan Workdei untuk 
+              Bergabunglah dengan ratusan tim yang telah menggunakan WorkDei untuk 
               menyederhanakan alur kerja, meningkatkan kolaborasi, dan mencapai target 
               lebih cepat. Gratis selamanya!
             </p>

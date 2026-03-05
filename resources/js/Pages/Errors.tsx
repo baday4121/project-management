@@ -99,7 +99,7 @@ export default function Errors({ status }: { status: number }) {
             ) : (
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <ShieldAlert className="h-3 w-3" />
-                Workdei Protection System
+                WorkDei Protection System
               </p>
             )}
           </CardFooter>

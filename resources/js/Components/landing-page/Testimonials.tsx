@@ -21,7 +21,7 @@ const testimonials: TestimonialProps[] = [
     name: "Sarah Chen",
     userName: "Tech Lead di DevCorp",
     comment:
-      "Workdei telah merevolusi cara kami menangani alur kerja proyek. Sistem manajemen tugas dan pelabelannya sangat intuitif.",
+      "WorkDei telah merevolusi cara kami menangani alur kerja proyek. Sistem manajemen tugas dan pelabelannya sangat intuitif.",
   },
   {
     image: "https://i.pravatar.cc/150?img=41",
@@ -56,7 +56,7 @@ const testimonials: TestimonialProps[] = [
     name: "David Kim",
     userName: "Engineering Manager",
     comment:
-      "Workdei secara signifikan meningkatkan produktivitas tim kami. Kemampuan untuk memantau tugas secara real-time sangat berharga.",
+      "WorkDei secara signifikan meningkatkan produktivitas tim kami. Kemampuan untuk memantau tugas secara real-time sangat berharga.",
   },
 ];
 
@@ -74,7 +74,7 @@ export const Testimonials = () => {
           </span>
         </h2>
         <p className="mt-4 text-xl text-muted-foreground">
-          Lihat bagaimana Workdei membantu tim berkolaborasi lebih baik dan menyelesaikan proyek lebih cepat.
+          Lihat bagaimana WorkDei membantu tim berkolaborasi lebih baik dan menyelesaikan proyek lebih cepat.
         </p>
       </div>
 

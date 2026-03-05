@@ -80,7 +80,7 @@ export default function Kanban({
               <CardHeader className="pb-4">
                 <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
                   <div className="space-y-1">
-                    <CardTitle className="text-2xl font-black italic tracking-tighter text-primary">Workdei Kanban</CardTitle>
+                    <CardTitle className="text-2xl font-black italic tracking-tighter text-primary">WorkDei Kanban</CardTitle>
                     <CardDescription className="text-base font-medium">
                       Proyek:{" "}
                       <Link

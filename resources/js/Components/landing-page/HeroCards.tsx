@@ -91,7 +91,7 @@ export const HeroCards = () => {
           </CardHeader>
           <CardContent className="pb-8 text-center">
             <p className="text-sm font-medium italic leading-relaxed text-muted-foreground lg:text-base">
-              "Workdei dirancang untuk mengubah cara tim pengembang berkolaborasi dan menyelesaikan proyek."
+              "WorkDei dirancang untuk mengubah cara tim pengembang berkolaborasi dan menyelesaikan proyek."
             </p>
           </CardContent>
         </Card>

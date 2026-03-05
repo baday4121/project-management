@@ -137,7 +137,7 @@ export default function Index({ users, queryParams, success }: IndexProps) {
                   <CardTitle className="text-2xl font-bold">Kelola Anggota Tim</CardTitle>
                 </div>
                 <p className="text-muted-foreground leading-relaxed max-w-2xl">
-                  Buat dan kelola akun pengguna, kontrol hak akses, dan pantau informasi anggota tim Workdei Anda dalam satu dasbor terpusat.
+                  Buat dan kelola akun pengguna, kontrol hak akses, dan pantau informasi anggota tim WorkDei Anda dalam satu dasbor terpusat.
                 </p>
               </div>
               <Link href={route("user.create")}>

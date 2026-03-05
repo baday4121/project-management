@@ -80,7 +80,7 @@ export const Footer = () => {
         <div className="flex flex-col gap-6">
           <Link href="/" className="flex items-center gap-3">
             <ApplicationLogo variant="circular" className="h-10 w-10" />
-            <span className="text-xl font-bold tracking-tight">Workdei</span>
+            <span className="text-xl font-bold tracking-tight">WorkDei</span>
           </Link>
           <p className="leading-relaxed text-muted-foreground">
             Solusi manajemen proyek cerdas untuk tim modern. Tingkatkan efisiensi dan kolaborasi dalam satu platform terpadu.
@@ -120,7 +120,7 @@ export const Footer = () => {
       <div className="mt-16 border-t pt-8">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} **Workdei Solutions**. Seluruh hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} **WorkDei Solutions**. Seluruh hak cipta dilindungi.
           </p>
           <p className="text-sm text-muted-foreground">
             Dikembangkan dengan penuh dedikasi oleh{" "}

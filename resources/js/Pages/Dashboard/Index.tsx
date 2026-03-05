@@ -93,7 +93,7 @@ export default function Dashboard({
                   Update Terbaru
                 </div>
                 <h1 className="text-3xl font-bold text-white md:text-4xl">
-                  Halo, selamat datang di <span className="text-primary">Workdei!</span>
+                  Halo, selamat datang di <span className="text-primary">WorkDei!</span>
                 </h1>
                 <p className="max-w-xl text-lg text-slate-300">
                   Pantau semua aktivitas proyek dan tugas tim Anda dalam satu tampilan cerdas. Apa yang ingin Anda kerjakan hari ini?

@@ -58,7 +58,7 @@ export default function AuthFlowLayout({ children }: PropsWithChildren) {
 
         {/* Footer Kecil */}
         <p className="text-center text-xs text-muted-foreground/60 italic">
-          &copy; {new Date().getFullYear()} PT Next Generation Solutions.
+          &copy; {new Date().getFullYear()} WorkDei
         </p>
       </div>
     </div>

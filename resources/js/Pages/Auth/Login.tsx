@@ -58,7 +58,7 @@ export default function Login({
 
   return (
     <AuthFlowLayout>
-      <Head title="Masuk ke Workdei" />
+      <Head title="Masuk ke WorkDei" />
       
       {status && (
         <Alert className="mb-6 border-none bg-emerald-500/15 text-emerald-600 shadow-sm dark:bg-emerald-500/10" variant="success">

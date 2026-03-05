@@ -14,13 +14,13 @@ interface FAQProps {
 
 const FAQList: FAQProps[] = [
   {
-    question: "Apakah Workdei gratis untuk digunakan?",
+    question: "Apakah WorkDei gratis untuk digunakan?",
     answer:
-      "Ya! Workdei sepenuhnya gratis untuk digunakan dengan semua fitur yang tersedia. Tanpa kartu kredit, tanpa biaya tersembunyi, dan tanpa batasan penggunaan fitur utama.",
+      "Ya! WorkDei sepenuhnya gratis untuk digunakan dengan semua fitur yang tersedia. Tanpa kartu kredit, tanpa biaya tersembunyi, dan tanpa batasan penggunaan fitur utama.",
     value: "pricing",
   },
   {
-    question: "Bagaimana cara kerja peran proyek di Workdei?",
+    question: "Bagaimana cara kerja peran proyek di WorkDei?",
     answer:
       "Setiap proyek memiliki dua peran utama: Manajer Proyek dan Anggota Proyek. Manajer dapat mengundang anggota, mengelola semua tugas, dan mengatur peran pengguna lain. Anggota dapat membuat tugas mereka sendiri, berpartisipasi dalam diskusi, dan menggunakan semua fitur kolaborasi.",
     value: "roles",
@@ -40,7 +40,7 @@ const FAQList: FAQProps[] = [
   {
     question: "Bagaimana cara mengatur tugas agar lebih rapi?",
     answer:
-      "Workdei menawarkan berbagai cara: label kustom untuk kategorisasi, pengaturan prioritas, tenggat waktu, dan penugasan anggota. Anda bisa memfilter dan mencari tugas berdasarkan parameter ini untuk menemukan apa yang Anda butuhkan dengan cepat.",
+      "WorkDei menawarkan berbagai cara: label kustom untuk kategorisasi, pengaturan prioritas, tenggat waktu, dan penugasan anggota. Anda bisa memfilter dan mencari tugas berdasarkan parameter ini untuk menemukan apa yang Anda butuhkan dengan cepat.",
     value: "organization",
   },
   {
@@ -65,7 +65,7 @@ export const FAQ = () => {
           </span>
         </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          Segala hal yang perlu Anda ketahui tentang Workdei dan cara kerjanya.
+          Segala hal yang perlu Anda ketahui tentang WorkDei dan cara kerjanya.
         </p>
       </div>
 

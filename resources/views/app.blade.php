@@ -7,12 +7,12 @@
 
     <!-- Primary Meta Tags -->
     <meta name="title"
-      content="{{ config('app.name', 'Workdei') }} - Modern Project Management Platform">
+      content="{{ config('app.name', 'WorkDei') }} - Modern Project Management Platform">
     <meta name="description"
-      content="Workdei is a modern project management application designed to help teams collaborate efficiently through intuitive task management, real-time communication, and powerful project tracking features.">
+      content="WorkDei is a modern project management application designed to help teams collaborate efficiently through intuitive task management, real-time communication, and powerful project tracking features.">
     <meta name="keywords"
       content="project management, task management, team collaboration, real-time updates, agile project management, task tracking, team communication, project planning, workflow management, project collaboration">
-    <meta name="author" content="Workdei">
+    <meta name="author" content="WorkDei">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
 
@@ -20,25 +20,25 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ config('app.url') }}">
     <meta property="og:title"
-      content="{{ config('app.name', 'Workdei') }} - Modern Project Management Platform">
+      content="{{ config('app.name', 'WorkDei') }} - Modern Project Management Platform">
     <meta property="og:description"
-      content="Boost team productivity with Workdei's intuitive project management tools, real-time collaboration features, and powerful task tracking capabilities.">
+      content="Boost team productivity with WorkDei's intuitive project management tools, real-time collaboration features, and powerful task tracking capabilities.">
     <meta property="og:image" content="{{ asset('screenshot.jpg') }}">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ config('app.url') }}">
     <meta property="twitter:title"
-      content="{{ config('app.name', 'Workdei') }} - Modern Project Management Platform">
+      content="{{ config('app.name', 'WorkDei') }} - Modern Project Management Platform">
     <meta property="twitter:description"
-      content="Boost team productivity with Workdei's intuitive project management tools, real-time collaboration features, and powerful task tracking capabilities.">
+      content="Boost team productivity with WorkDei's intuitive project management tools, real-time collaboration features, and powerful task tracking capabilities.">
     <meta property="twitter:image" content="{{ asset('screenshot.jpg') }}">
 
     <!-- Favicon -->
     <link rel="icon" href="/logo.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.svg">
 
-    <title inertia>{{ config('app.name', 'Workdei') }}</title>
+    <title inertia>{{ config('app.name', 'WorkDei') }}</title>
 
     <!-- Application Color Theme -->
     <meta name="theme-color" content="#0096ff">

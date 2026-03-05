@@ -98,7 +98,7 @@ export default function DeleteUserForm({ className = "" }: { className?: string 
               Apakah Anda yakin?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base text-muted-foreground">
-              Tindakan ini tidak dapat dibatalkan. Semua data Anda di **Workdei** akan hilang selamanya. 
+              Tindakan ini tidak dapat dibatalkan. Semua data Anda di **WorkDei** akan hilang selamanya. 
               Silakan masukkan kata sandi Anda untuk konfirmasi akhir.
             </AlertDialogDescription>
           </div>

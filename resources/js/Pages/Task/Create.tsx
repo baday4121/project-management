@@ -299,7 +299,7 @@ export default function Create({
                         </Label>
                         <Input
                           id="task_name"
-                          placeholder="Contoh: Implementasi API Nexicon"
+                          placeholder="Contoh: Implementasi API"
                           className="h-11 shadow-sm"
                           value={data.name}
                           onChange={(e) => setData("name", e.target.value)}

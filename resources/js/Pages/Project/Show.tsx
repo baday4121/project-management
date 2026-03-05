@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import ProjectInfo from "./Partials/ProjectInfo";
@@ -9,6 +9,8 @@ import { Project } from "@/types/project";
 import { PaginatedTask } from "@/types/task";
 import { QueryParams } from "@/types/utils";
 import { toast } from "@/hooks/use-toast";
+import { FolderKanban, Info, UserPlus, ListTodo, ChevronLeft } from "lucide-react";
+import { Button } from "@/Components/ui/button";
 
 type Props = {
   project: Project;
@@ -41,14 +43,12 @@ export default function Show({
 
   const [activeTab, setActiveTab] = useState(initialActiveTab);
 
-  // Update the URL without making a server request
   const updateUrlWithoutRefresh = (newTab: string) => {
     const url = new URL(window.location.href);
     url.searchParams.set("tab", newTab);
     window.history.pushState({ tab: newTab }, "", url.toString());
   };
 
-  // Replace the existing handleTabChange
   const handleTabChange = (newTab: string) => {
     if (newTab !== activeTab) {
       setActiveTab(newTab);
@@ -56,9 +56,8 @@ export default function Show({
     }
   };
 
-  // Update useEffect for popstate event
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
+    const handlePopState = () => {
       const url = new URL(window.location.href);
       const tab = url.searchParams.get("tab") || "tasks";
       setActiveTab(tab);
@@ -71,14 +70,13 @@ export default function Show({
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         variant: "success",
         description: success,
       });
     }
   }, [success]);
 
-  // Update handleInviteClick
   const handleInviteClick = () => {
     handleTabChange("invite");
   };
@@ -86,45 +84,89 @@ export default function Show({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            {`Project "${project.name}"`}
-          </h2>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:block">
+              <Link href={route("project.index")}>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+            <div className="flex items-center gap-2">
+              <FolderKanban className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-black tracking-tight text-gray-800 dark:text-gray-100">
+                {project.name}
+              </h2>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-primary/5">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            Proyek Aktif
+          </div>
         </div>
       }
     >
-      <Head title={`Project "${project.name}"`} />
+      <Head title={`Proyek: ${project.name}`} />
 
-      <div className="space-y-12 py-8">
-        <div className="mx-auto max-w-7xl space-y-6 px-3 sm:px-6 lg:px-8">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid auto-cols-[minmax(0,_2fr)] grid-flow-col shadow-sm">
-              <TabsTrigger value="tasks">Project Tasks</TabsTrigger>
-              <TabsTrigger value="info">Project Info</TabsTrigger>
-              {permissions.canInviteUsers && (
-                <TabsTrigger value="invite">Invite Users</TabsTrigger>
-              )}
-            </TabsList>
-            <TabsContent value="tasks">
-              <ProjectTasks
-                tasks={tasks}
-                queryParams={queryParams}
-                projectId={project.id}
-                permissions={permissions}
-                labelOptions={labelOptions}
-                statusOptions={statusOptions}
-              />
-            </TabsContent>
-            <TabsContent value="info">
-              <ProjectInfo
-                project={project}
-                onInviteClick={handleInviteClick}
-                permissions={permissions}
-              />
-            </TabsContent>
-            <TabsContent value="invite">
-              <InviteUsers project={project} serverError={serverError} />
-            </TabsContent>
+      <div className="py-8">
+        <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full space-y-6">
+            <div className="flex justify-center sm:justify-start">
+              <TabsList className="inline-flex h-12 items-center justify-center rounded-xl bg-muted/50 p-1 text-muted-foreground shadow-inner border border-primary/5">
+                <TabsTrigger 
+                  value="tasks" 
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2 text-sm font-bold transition-all data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+                >
+                  <ListTodo className="h-4 w-4" />
+                  Daftar Tugas
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="info"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2 text-sm font-bold transition-all data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+                >
+                  <Info className="h-4 w-4" />
+                  Informasi
+                </TabsTrigger>
+                {permissions.canInviteUsers && (
+                  <TabsTrigger 
+                    value="invite"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg px-6 py-2 text-sm font-bold transition-all data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-sm"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Undang Tim
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </div>
+
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <TabsContent value="tasks" className="focus-visible:outline-none">
+                <ProjectTasks
+                  tasks={tasks}
+                  queryParams={queryParams}
+                  projectId={project.id}
+                  permissions={permissions}
+                  labelOptions={labelOptions}
+                  statusOptions={statusOptions}
+                />
+              </TabsContent>
+              
+              <TabsContent value="info" className="focus-visible:outline-none">
+                <ProjectInfo
+                  project={project}
+                  onInviteClick={handleInviteClick}
+                  permissions={permissions}
+                />
+              </TabsContent>
+              
+              <TabsContent value="invite" className="focus-visible:outline-none">
+                <InviteUsers project={project} serverError={serverError} />
+              </TabsContent>
+            </div>
           </Tabs>
         </div>
       </div>

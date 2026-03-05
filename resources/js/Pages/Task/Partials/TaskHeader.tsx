@@ -9,8 +9,14 @@ import {
   TASK_STATUS_BADGE_MAP,
 } from "@/utils/constants";
 import { Link } from "@inertiajs/react";
-
-import { ChevronRight, Pencil, Plus, Trash2, FolderKanban, Hash } from "lucide-react";
+import { 
+  ChevronRight, 
+  Pencil, 
+  Plus, 
+  Trash2, 
+  FolderKanban, 
+  Hash 
+} from "lucide-react";
 
 type TaskHeaderProps = {
   task: Task;
@@ -26,13 +32,12 @@ export function TaskHeader({ task }: TaskHeaderProps) {
         "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan dan semua data terkait akan hilang.",
       action: () => router.delete(route("task.destroy", task.id)),
       actionText: "Ya, Hapus",
-      variant: "destructive",
     });
   };
 
   return (
     <div className="space-y-6 rounded-2xl border bg-card/50 p-5 shadow-sm backdrop-blur-sm sm:p-8 overflow-hidden relative">
-      {/* Background Accent / Dekorasi halus */}
+      {/* Efek Cahaya Latar Dekoratif */}
       <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
 
       {/* Navigasi Breadcrumb */}

@@ -11,7 +11,7 @@ export const Hero = () => {
       
       <div className="grid items-center gap-16 py-24 md:py-36 lg:grid-cols-2 lg:gap-12">
         <div className="flex flex-col space-y-8 text-center lg:text-start">
-          <main className="text-5xl font-extrabold tracking-tight md:text-7xl">
+          <main className="text-5xl font-extrabold tracking-tight md:text-6xl">
             <h1 className="leading-tight">
               Kelola Proyek Lebih{" "}
               <span className="block bg-gradient-to-r from-primary via-primary-light to-primary-dark bg-clip-text text-transparent">

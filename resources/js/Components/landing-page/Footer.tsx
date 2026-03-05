@@ -14,39 +14,39 @@ interface FooterLink {
 const footerLinks = {
   socialLinks: [
     {
-      label: "View on GitHub",
-      href: "https://github.com/baday4121/project-management-app",
+      label: "GitHub",
+      href: "https://github.com/baday4121/project-management",
       external: true,
       icon: <GitHubLogoIcon className="h-4 w-4" />,
     },
     {
-      label: "Contact Us",
+      label: "Hubungi Kami",
       href: "mailto:baday4121@gmail.com",
       external: true,
     },
   ],
   quickLinks: [
     {
-      label: "Features",
+      label: "Fitur Unggulan",
       href: "#features",
     },
     {
-      label: "Testimonials",
+      label: "Testimoni",
       href: "#testimonials",
     },
     {
-      label: "FAQ",
+      label: "Tanya Jawab (FAQ)",
       href: "#faq",
     },
   ],
   authLinks: [
     {
-      label: "Sign in",
+      label: "Masuk",
       href: route("login"),
       variant: "outline",
     },
     {
-      label: "Create Account",
+      label: "Daftar Akun",
       href: route("register"),
       variant: "default",
     },
@@ -61,7 +61,7 @@ export const Footer = () => {
       target={link.external ? "_blank" : undefined}
       rel={link.external ? "noreferrer noopener" : undefined}
       title={link.title || link.label}
-      className="max-w-max text-sm text-muted-foreground hover:text-primary"
+      className="max-w-max text-sm text-muted-foreground transition-colors hover:text-primary"
     >
       {link.icon && (
         <span className="flex items-center gap-2">
@@ -75,36 +75,39 @@ export const Footer = () => {
 
   return (
     <footer className="container mx-auto max-w-7xl border-t px-4 py-16">
-      <div className="grid gap-8 md:grid-cols-3 md:gap-16">
+      <div className="grid gap-12 md:grid-cols-3 md:gap-16">
         {/* Brand Column */}
-        <div className="flex flex-col gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <ApplicationLogo variant="circular" className="h-8 w-8" />
-            <span className="font-semibold">Workdei</span>
+        <div className="flex flex-col gap-6">
+          <Link href="/" className="flex items-center gap-3">
+            <ApplicationLogo variant="circular" className="h-10 w-10" />
+            <span className="text-xl font-bold tracking-tight">Workdei</span>
           </Link>
-          <p className="text-sm text-muted-foreground">
-            Efficient project management for modern teams
+          <p className="leading-relaxed text-muted-foreground">
+            Solusi manajemen proyek cerdas untuk tim modern. Tingkatkan efisiensi dan kolaborasi dalam satu platform terpadu.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             {footerLinks.socialLinks.map(renderExternalLink)}
           </div>
         </div>
 
         {/* Quick Links Column */}
-        <div className="flex flex-col gap-4">
-          <h3 className="font-semibold">Quick Links</h3>
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-6">
+          <h3 className="text-lg font-bold">Tautan Cepat</h3>
+          <div className="flex flex-col gap-3">
             {footerLinks.quickLinks.map(renderExternalLink)}
           </div>
         </div>
 
         {/* Actions Column */}
-        <div className="flex flex-col gap-4">
-          <h3 className="font-semibold">Get Started</h3>
-          <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex flex-col gap-6">
+          <h3 className="text-lg font-bold">Mulai Sekarang</h3>
+          <p className="text-sm text-muted-foreground">
+            Siap untuk mengoptimalkan alur kerja tim Anda?
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
             {footerLinks.authLinks.map((link) => (
-              <Link key={link.label} href={link.href} title={link.label}>
-                <Button variant={link.variant} className="w-full sm:w-auto">
+              <Link key={link.label} href={link.href} title={link.label} className="w-full">
+                <Button variant={link.variant as any} className="w-full shadow-sm">
                   {link.label}
                 </Button>
               </Link>
@@ -114,20 +117,16 @@ export const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="mt-16 border-t pt-8 text-center text-sm text-muted-foreground">
-        <p>
-          &copy; {new Date().getFullYear()} Workdei. Created by{" "}
-          <a
-            className="dark:text-primary-light text-primary hover:underline"
-            target="_blank"
-            rel="noreferrer noopener"
-            title="Stefan Gogov"
-            href="https://sgogov.dev/"
-          >
-            Stefan Gogov
-          </a>{" "}
-          All rights reserved.
-        </p>
+      <div className="mt-16 border-t pt-8">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} **Workdei Solutions**. Seluruh hak cipta dilindungi.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Dikembangkan dengan penuh dedikasi oleh{" "}
+            <span className="font-semibold text-primary">Ari Gunawan</span>
+          </p>
+        </div>
       </div>
     </footer>
   );

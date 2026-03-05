@@ -21,7 +21,7 @@ export const Hero = () => {
           </main>
 
           <p className="mx-auto text-xl leading-relaxed text-muted-foreground md:w-11/12 lg:mx-0">
-            Optimalkan alur kerja tim Anda dengan solusi manajemen proyek Nexicon. 
+            Optimalkan alur kerja tim Anda dengan solusi manajemen proyek Workdei. 
             Pantau tugas, kolaborasi real-time, dan capai target lebih mudah dalam satu platform terpadu.
           </p>
 

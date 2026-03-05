@@ -39,7 +39,7 @@ export const About = () => {
                 </span>
               </h2>
               <p className="mx-auto text-lg leading-relaxed text-muted-foreground md:text-xl lg:mx-0">
-                Nexicon menghadirkan semua kebutuhan tim Anda dalam satu ekosistem digital. 
+                Workdei menghadirkan semua kebutuhan tim Anda dalam satu ekosistem digital. 
                 Mulai dari pemantauan tugas hingga kolaborasi real-time, platform intuitif kami 
                 membantu tim tetap terorganisir, fokus, dan produktif dengan fitur yang dirancang 
                 khusus untuk efisiensi maksimal.

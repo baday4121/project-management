@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import InputError from "@/Components/InputError";
 import { useToast } from "@/hooks/use-toast";
 import { DateTimePicker } from "@/Components/ui/time-picker/date-time-picker";
@@ -21,18 +20,6 @@ import { TaskLabelBadgeVariant } from "@/utils/constants";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import RichTextEditor from "@/Components/RichTextEditor";
-import { 
-  ClipboardPlus, 
-  Layers, 
-  ImagePlus, 
-  Tag, 
-  AlignLeft, 
-  Calendar, 
-  Flag, 
-  UserCircle, 
-  ArrowLeft,
-  Loader2
-} from "lucide-react";
 
 type Props = {
   projects: PaginatedProject;
@@ -63,12 +50,10 @@ export default function Create({
   const [canAssignOthers, setCanAssignOthers] = useState(true);
   const [users, setUsers] = useState<PaginatedUser>(initialUsers || { data: [] });
   const [statusOptions, setStatusOptions] = useState(initialStatusOptions);
-  const [showFields, setShowFields] = useState(Boolean(selectedProjectId));
-  const [key, setKey] = useState(0);
 
   const isProjectSelectionDisabled = Boolean(selectedProjectId && fromProjectPage);
 
-  const { data, setData, post, errors, reset, processing } = useForm({
+  const { data, setData, post, errors, reset } = useForm({
     image: null as File | null,
     name: "",
     description: "",
@@ -80,6 +65,7 @@ export default function Create({
     label_ids: [] as number[],
   });
 
+  // Add state for available labels
   const [availableLabels, setAvailableLabels] = useState<Option[]>(
     initialLabels.data.map((label) => ({
       label: label.name as string,
@@ -88,12 +74,17 @@ export default function Create({
     })),
   );
 
+  const [key, setKey] = useState(0); //  state for forcing re-render
+
+  // Add loading states
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [isLoadingStatuses, setIsLoadingStatuses] = useState(false);
 
   const searchLabels = async (query: string): Promise<Option[]> => {
     if (!data.project_id) return [];
+
+    // Return filtered labels immediately (no API call needed)
     return availableLabels.filter((label) =>
       label.label.toLowerCase().includes(query.toLowerCase()),
     );
@@ -101,9 +92,11 @@ export default function Create({
 
   const fetchProjectLabels = async (projectId: string) => {
     if (!projectId) return;
+
     setIsLoadingLabels(true);
     try {
       const response = await axios.get(route("task.labels", projectId));
+
       if (response.data.data) {
         const labels = response.data.data.map((label: any) => ({
           label: label.name,
@@ -111,10 +104,10 @@ export default function Create({
           variant: label.variant as TaskLabelBadgeVariant,
         }));
         setAvailableLabels(labels);
-        setKey((prev) => prev + 1);
+        setKey((prev) => prev + 1); // Force MultipleSelector to re-render with new options
       }
     } catch (error) {
-      console.error("Gagal mengambil label proyek:", error);
+      console.error("Failed to fetch project labels:", error);
     } finally {
       setIsLoadingLabels(false);
     }
@@ -124,22 +117,17 @@ export default function Create({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     post(route("task.store"), {
       preserveState: true,
-      onSuccess: () => {
-        reset();
-        toast({
-          title: "Berhasil",
-          description: "Tugas baru telah berhasil dibuat.",
-          variant: "success",
-        });
-      },
+      onSuccess: () => reset(),
       onError: (error) => {
         const errorMessage = Object.values(error).join(" ");
         toast({
-          title: "Gagal membuat tugas",
+          title: "Failed to create task",
           variant: "destructive",
           description: errorMessage,
+          duration: 5000,
         });
       },
     });
@@ -149,22 +137,26 @@ export default function Create({
     try {
       const response = await axios.get(route("project.check-role", projectId));
       const isProjectMember = response.data.isProjectMember;
+
       setCanAssignOthers(!isProjectMember);
 
+      // If project member, set their ID and update users list to only include themselves
       if (isProjectMember) {
         setData("assigned_user_id", currentUserId.toString());
         setUsers({
           data: [
             {
               id: currentUserId,
-              name: initialUsers.data.find((u) => u.id === currentUserId)?.name || "",
-              email: initialUsers.data.find((u) => u.id === currentUserId)?.email || "",
+              name:
+                initialUsers.data.find((u) => u.id === currentUserId)?.name || "",
+              email:
+                initialUsers.data.find((u) => u.id === currentUserId)?.email || "",
             },
           ],
         });
       }
     } catch (error) {
-      console.error("Gagal memeriksa peran proyek:", error);
+      console.error("Failed to check project role:", error);
     }
   };
 
@@ -174,11 +166,11 @@ export default function Create({
       const response = await axios.get(route("task.users", projectId));
       setUsers(response.data.users || { data: [] });
     } catch (error) {
-      console.error("Gagal mengambil pengguna proyek:", error);
-      setUsers({ data: [] });
+      console.error("Failed to fetch project users:", error);
+      setUsers({ data: [] }); // Set empty data on error
       toast({
         title: "Error",
-        description: "Gagal mengambil daftar pengguna proyek",
+        description: "Failed to fetch project users",
         variant: "destructive",
       });
     } finally {
@@ -194,13 +186,16 @@ export default function Create({
         setStatusOptions(response.data.statusOptions);
       }
     } catch (error) {
-      console.error("Gagal mengambil status proyek:", error);
+      console.error("Failed to fetch project statuses:", error);
     } finally {
       setIsLoadingStatuses(false);
     }
   };
 
+  const [showFields, setShowFields] = useState(Boolean(selectedProjectId));
+
   const handleProjectChange = async (projectId: string) => {
+    // Reset dependent fields
     setData((prev) => ({
       ...prev,
       project_id: projectId,
@@ -216,18 +211,25 @@ export default function Create({
         fetchProjectLabels(projectId),
         !selectedStatusId ? fetchProjectStatuses(projectId) : Promise.resolve(),
       ]);
-      setShowFields(true);
+      setShowFields(true); // Show fields after data is loaded
     } catch (error) {
-      console.error("Gagal memuat data proyek:", error);
+      console.error("Failed to fetch project data:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch project data",
+        variant: "destructive",
+      });
     }
   };
 
+  // Initialize project selection and fetch related data if coming from project page
   useEffect(() => {
     if (selectedProjectId) {
       handleProjectChange(selectedProjectId.toString());
     }
   }, [selectedProjectId]);
 
+  // Preserve selected status when project is preselected
   useEffect(() => {
     if (selectedStatusId) {
       setData("status_id", selectedStatusId);
@@ -237,246 +239,248 @@ export default function Create({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ClipboardPlus className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
-              Buat Tugas Baru
-            </h2>
-          </div>
-          <Button variant="ghost" size="sm" className="gap-2" onClick={() => window.history.back()}>
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </Button>
-        </div>
+        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+          Create New Task{" "}
+          {data.project_id
+            ? `for ${projects.data.find((p) => p.id.toString() === data.project_id)?.name}`
+            : ""}
+        </h2>
       }
     >
-      <Head title="Buat Tugas" />
+      <Head title="Tasks" />
 
       <div className="py-8">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
-            <CardHeader className="border-b bg-muted/20 pb-6">
-              <CardTitle className="text-2xl font-black">Detail Tugas</CardTitle>
-              <CardDescription>
-                {data.project_id 
-                  ? `Menambahkan tugas untuk proyek: ${projects.data.find((p) => p.id.toString() === data.project_id)?.name}`
-                  : "Pilih proyek terlebih dahulu untuk memulai pengisian detail tugas."}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-8">
-              <form onSubmit={onSubmit} className="space-y-8">
-                
-                {/* Pemilihan Proyek */}
-                <div className="space-y-3">
-                  <Label htmlFor="task_project_id" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                    <Layers className="h-3.5 w-3.5 text-primary" /> Proyek Terkait <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    onValueChange={handleProjectChange}
-                    defaultValue={selectedProjectId?.toString()}
-                    disabled={isProjectSelectionDisabled}
-                    required
-                  >
-                    <SelectTrigger className="h-11 shadow-sm focus:ring-primary/20">
-                      <SelectValue placeholder="Pilih Proyek" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {projects.data.map((project) => (
-                        <SelectItem key={project.id} value={project.id.toString()}>
-                          {project.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <InputError message={errors.project_id} />
-                </div>
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <form
+              onSubmit={onSubmit}
+              className="space-y-6 bg-white p-4 shadow dark:bg-card sm:rounded-lg sm:p-8"
+            >
+              {/* Project Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="task_project_id">
+                  Project <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  onValueChange={handleProjectChange}
+                  defaultValue={selectedProjectId?.toString()}
+                  disabled={isProjectSelectionDisabled}
+                  required
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.data.map((project) => (
+                      <SelectItem key={project.id} value={project.id.toString()}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <InputError message={errors.project_id} className="mt-2" />
+              </div>
 
-                {showFields && (
-                  <div className="animate-in fade-in slide-in-from-top-4 duration-500 space-y-8">
-                    
-                    {/* Nama Tugas */}
-                    <div className="space-y-3">
-                      <Label htmlFor="task_name" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                        <AlignLeft className="h-3.5 w-3.5 text-primary" /> Nama Tugas <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="task_name"
-                        placeholder="Contoh: Implementasi API Authentication"
-                        className="h-11 shadow-sm focus:ring-primary/20"
-                        value={data.name}
-                        onChange={(e) => setData("name", e.target.value)}
-                        required
-                        autoFocus
-                      />
-                      <InputError message={errors.name} />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {/* Gambar Tugas */}
-                      <div className="space-y-3">
-                        <Label htmlFor="task_image_path" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                          <ImagePlus className="h-3.5 w-3.5 text-primary" /> Lampiran Gambar <span className="text-[9px] font-normal text-muted-foreground lowercase">(opsional)</span>
-                        </Label>
-                        <Input
-                          id="task_image_path"
-                          type="file"
-                          className="cursor-pointer h-11 pt-2 shadow-sm bg-muted/10"
-                          accept=".jpg,.jpeg,.png,.webp,.svg"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              setData("image", e.target.files[0]);
-                            }
-                          }}
-                        />
-                        <InputError message={errors.image} />
-                      </div>
-
-                      {/* Label Tugas */}
-                      <div className="space-y-3">
-                        <Label htmlFor="task_labels" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                          <Tag className="h-3.5 w-3.5 text-primary" /> Label Tugas
-                        </Label>
-                        <MultipleSelector
-                          key={key}
-                          defaultOptions={availableLabels}
-                          placeholder={isLoadingLabels ? "Memuat label..." : "Pilih label..."}
-                          emptyIndicator={<span className="text-xs italic p-2">Label tidak ditemukan</span>}
-                          onSearch={searchLabels}
-                          triggerSearchOnFocus
-                          className="min-h-11 shadow-sm"
-                          onChange={(selectedLabels) =>
-                            setData("label_ids", selectedLabels.map((l) => Number(l.value)))
-                          }
-                          value={data.label_ids.map((id) => availableLabels.find((l) => Number(l.value) === id)).filter(Boolean) as Option[]}
-                          disabled={isLoadingLabels || !data.project_id}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Deskripsi Tugas */}
-                    <div className="space-y-3">
-                      <Label htmlFor="task_description" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                        <AlignLeft className="h-3.5 w-3.5 text-primary" /> Deskripsi Lengkap <span className="text-red-500">*</span>
-                      </Label>
-                      <div className="rounded-md border shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                        <RichTextEditor
-                          value={data.description}
-                          onChange={(content) => setData("description", content)}
-                        />
-                      </div>
-                      <InputError message={errors.description} />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {/* Deadline */}
-                      <div className="space-y-3">
-                        <Label htmlFor="task_due_date" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                          <Calendar className="h-3.5 w-3.5 text-primary" /> Tenggat Waktu
-                        </Label>
-                        <DateTimePicker
-                          className="w-full h-11"
-                          value={data.due_date ? new Date(data.due_date) : undefined}
-                          onChange={(date) => setData("due_date", date ? date.toISOString() : "")}
-                        />
-                        <InputError message={errors.due_date} />
-                      </div>
-
-                      {/* Status */}
-                      <div className="space-y-3">
-                        <Label htmlFor="task_status" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                          {isLoadingStatuses ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Layers className="h-3.5 w-3.5 text-primary" />}
-                          Status <span className="text-red-500">*</span>
-                        </Label>
-                        <Select
-                          onValueChange={(value) => setData("status_id", value)}
-                          value={data.status_id?.toString()}
-                          disabled={isLoadingStatuses}
-                          required
-                        >
-                          <SelectTrigger className="h-11 shadow-sm">
-                            <SelectValue placeholder={isLoadingStatuses ? "Memuat..." : "Pilih Status"} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map(({ value, label }) => (
-                              <SelectItem key={value} value={value.toString()}>{label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <InputError message={errors.status_id} />
-                      </div>
-
-                      {/* Prioritas */}
-                      <div className="space-y-3">
-                        <Label htmlFor="task_priority" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                          <Flag className="h-3.5 w-3.5 text-primary" /> Prioritas <span className="text-red-500">*</span>
-                        </Label>
-                        <Select onValueChange={(value) => setData("priority", value)} defaultValue={data.priority} required>
-                          <SelectTrigger className="h-11 shadow-sm">
-                            <SelectValue placeholder="Pilih Urgensi" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="low">Rendah (Low)</SelectItem>
-                            <SelectItem value="medium">Sedang (Medium)</SelectItem>
-                            <SelectItem value="high">Tinggi (High)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <InputError message={errors.priority} />
-                      </div>
-                    </div>
-
-                    {/* Penanggung Jawab */}
-                    <div className="space-y-3">
-                      <Label htmlFor="task_assigned_user" className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-muted-foreground">
-                        {isLoadingUsers ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserCircle className="h-3.5 w-3.5 text-primary" />}
-                        Ditugaskan Kepada
-                      </Label>
-                      <Select
-                        onValueChange={(value) => setData("assigned_user_id", value === "unassigned" ? "" : value)}
-                        value={data.assigned_user_id || "unassigned"}
-                        disabled={isLoadingUsers}
-                      >
-                        <SelectTrigger className="h-11 shadow-sm bg-muted/5">
-                          <SelectValue placeholder={isLoadingUsers ? "Memuat anggota..." : "Pilih Anggota"} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="unassigned">Belum Ditugaskan</SelectItem>
-                          {users.data.map((user) => (
-                            <SelectItem key={user.id} value={user.id.toString()}>
-                              {user.name} ({user.email})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <InputError message={errors.assigned_user_id} />
-                    </div>
+              {/* Conditional rendering for all other fields */}
+              {showFields && (
+                <>
+                  {/* Task Image */}
+                  <div>
+                    <Label htmlFor="task_image_path">
+                      Task Image{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
+                    <Input
+                      id="task_image_path"
+                      type="file"
+                      className="mt-1 block w-full"
+                      accept=".jpg,.jpeg,.png,.webp,.svg"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setData("image", e.target.files[0]);
+                        }
+                      }}
+                    />
+                    <InputError message={errors.image} className="mt-2" />
                   </div>
-                )}
 
-                {/* Tombol Aksi */}
-                <div className="flex items-center justify-end gap-3 border-t pt-8">
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    className="font-semibold" 
-                    onClick={() => window.history.back()}
-                  >
-                    Batalkan
-                  </Button>
-                  {showFields && (
-                    <Button 
-                      type="submit" 
-                      size="lg" 
-                      className="px-8 font-black shadow-lg shadow-primary/20 transition-all active:scale-95"
-                      disabled={processing}
+                  {/* Task Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_name">
+                      Task Name <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="task_name"
+                      type="text"
+                      placeholder="Enter a task name"
+                      value={data.name}
+                      onChange={(e) => setData("name", e.target.value)}
+                      required
+                      autoFocus
+                    />
+                    <InputError message={errors.name} className="mt-2" />
+                  </div>
+
+                  {/* Task Labels */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_labels">
+                      Task Labels{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
+                    <MultipleSelector
+                      key={key}
+                      defaultOptions={availableLabels}
+                      placeholder={
+                        isLoadingLabels ? "Loading labels..." : "Select labels..."
+                      }
+                      emptyIndicator="No labels found"
+                      onSearch={searchLabels}
+                      triggerSearchOnFocus
+                      onChange={(selectedLabels) =>
+                        setData(
+                          "label_ids",
+                          selectedLabels.map((label) => Number(label.value)),
+                        )
+                      }
+                      value={
+                        data.label_ids
+                          .map((id) =>
+                            availableLabels.find(
+                              (label) => Number(label.value) === id,
+                            ),
+                          )
+                          .filter(Boolean) as Option[]
+                      }
+                      disabled={isLoadingLabels || !data.project_id}
+                    />
+                  </div>
+
+                  {/* Task Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_description">
+                      Task Description <span className="text-red-500">*</span>
+                    </Label>
+                    <RichTextEditor
+                      value={data.description}
+                      onChange={(content) => setData("description", content)}
+                    />
+                    <InputError message={errors.description} className="mt-2" />
+                  </div>
+
+                  {/* Task Deadline */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_due_date">
+                      Task Deadline{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
+                    <DateTimePicker
+                      className="w-full"
+                      value={data.due_date ? new Date(data.due_date) : undefined}
+                      onChange={(date) =>
+                        setData("due_date", date ? date.toISOString() : "")
+                      }
+                    />
+                    <InputError message={errors.due_date} className="mt-2" />
+                  </div>
+
+                  {/* Task Status */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_status">
+                      Task Status <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value) => setData("status_id", value)}
+                      value={data.status_id?.toString()}
+                      disabled={isLoadingStatuses}
+                      required
                     >
-                      {processing ? "Memproses..." : "BUAT TUGAS"}
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            isLoadingStatuses
+                              ? "Loading statuses..."
+                              : "Select Status"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map(({ value, label }) => (
+                          <SelectItem key={value} value={value.toString()}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <InputError message={errors.status_id} className="mt-2" />
+                  </div>
+
+                  {/* Task Priority */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_priority">
+                      Task Priority <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value) => setData("priority", value)}
+                      defaultValue={data.priority}
+                      required
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <InputError message={errors.priority} className="mt-2" />
+                  </div>
+
+                  {/* Assigned User */}
+                  <div className="space-y-2">
+                    <Label htmlFor="task_assigned_user">
+                      Assigned User{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
+                    <Select
+                      onValueChange={(value) =>
+                        setData(
+                          "assigned_user_id",
+                          value === "unassigned" ? "" : value,
+                        )
+                      }
+                      value={data.assigned_user_id || "unassigned"}
+                      disabled={isLoadingUsers}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            isLoadingUsers ? "Loading users..." : "Select User"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        {users.data.map((user) => (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            {user.name} ({user.email})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <InputError message={errors.assigned_user_id} className="mt-2" />
+                  </div>
+                </>
+              )}
+              {/* Actions */}
+              <div className="flex justify-end space-x-4">
+                <Button variant="secondary" onClick={() => window.history.back()}>
+                  Cancel
+                </Button>
+                {showFields && <Button type="submit">Submit</Button>}
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </AuthenticatedLayout>

@@ -1,4 +1,4 @@
-import { Head, useForm, Link } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/Components/ui/button";
 import { Label } from "@/Components/ui/label";
@@ -11,15 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/Components/ui/card";
 import InputError from "@/Components/InputError";
 import { useToast } from "@/hooks/use-toast";
 import { DateTimePicker } from "@/Components/ui/time-picker/date-time-picker";
 import { getStatusOptions } from "@/utils/constants";
-import { FolderPlus, ImagePlus, Calendar, Info, ArrowLeft } from "lucide-react";
 
-export default function Create() {
-  const { data, setData, post, errors, reset, processing } = useForm({
+type Props = {};
+
+export default function Create({}: Props) {
+  const { data, setData, post, errors, reset } = useForm({
     image: null as File | null,
     name: "",
     description: "",
@@ -34,20 +34,14 @@ export default function Create() {
 
     post(route("project.store"), {
       preserveState: true,
-      onSuccess: () => {
-        reset();
-        toast({
-          title: "Berhasil",
-          description: "Proyek baru telah berhasil dibuat.",
-          variant: "success",
-        });
-      },
+      onSuccess: () => reset(),
       onError: (error) => {
         const errorMessage = Object.values(error).join(" ");
         toast({
-          title: "Gagal membuat proyek",
+          title: "Failed to create project",
           variant: "destructive",
           description: errorMessage,
+          duration: 5000,
         });
       },
     });
@@ -56,149 +50,119 @@ export default function Create() {
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FolderPlus className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
-              Buat Proyek Baru
-            </h2>
-          </div>
-          <Link href={route("project.index")}>
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Kembali
-            </Button>
-          </Link>
-        </div>
+        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+          Create New Project
+        </h2>
       }
     >
-      <Head title="Buat Proyek" />
+      <Head title="Projects" />
 
-      <div className="py-12">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
-            <CardHeader className="space-y-1 border-b bg-muted/20 pb-6">
-              <CardTitle className="text-2xl font-black">Detail Proyek</CardTitle>
-              <CardDescription>
-                Isi informasi di bawah ini untuk memulai kolaborasi tim Anda.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-8">
-              <form onSubmit={onSubmit} className="space-y-8">
-                
-                {/* Gambar Proyek */}
-                <div className="space-y-3">
-                  <Label htmlFor="image" className="flex items-center gap-2 font-bold">
-                    <ImagePlus className="h-4 w-4 text-primary" />
-                    Thumbnail Proyek <span className="text-xs font-normal text-muted-foreground">(Opsional)</span>
-                  </Label>
-                  <Input
-                    id="image"
-                    type="file"
-                    className="cursor-pointer h-11 pt-2 shadow-sm focus:ring-primary/20"
-                    accept=".jpg,.jpeg,.png,.webp,.svg"
-                    onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        setData("image", e.target.files[0]);
-                      }
-                    }}
-                  />
-                  <InputError message={errors.image} />
-                </div>
+      <div className="py-8">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <form
+              onSubmit={onSubmit}
+              className="space-y-6 bg-white p-4 shadow dark:bg-card sm:rounded-lg sm:p-8"
+            >
+              {/* Project Image Upload */}
+              <div className="space-y-2">
+                <Label htmlFor="image">
+                  Project Image{" "}
+                  <span className="text-muted-foreground">(Optional)</span>
+                </Label>
+                <Input
+                  id="image"
+                  type="file"
+                  className="cursor-pointer"
+                  accept=".jpg,.jpeg,.png,.webp,.svg"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      setData("image", e.target.files[0]);
+                    }
+                  }}
+                />
+                <InputError message={errors.image} />
+              </div>
 
-                {/* Nama Proyek */}
-                <div className="space-y-3">
-                  <Label htmlFor="project_name" className="flex items-center gap-2 font-bold">
-                    <Info className="h-4 w-4 text-primary" />
-                    Nama Proyek <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="project_name"
-                    placeholder="Contoh: Aplikasi SaaS POS"
-                    className="h-11 shadow-sm focus:ring-primary/20"
-                    value={data.name}
-                    onChange={(e) => setData("name", e.target.value)}
-                    required
-                  />
-                  <InputError message={errors.name} />
-                </div>
+              {/* Project Name */}
+              <div className="space-y-2">
+                <Label htmlFor="project_name">
+                  Project Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="project_name"
+                  type="text"
+                  value={data.name}
+                  onChange={(e) => setData("name", e.target.value)}
+                  required
+                  autoFocus
+                />
+                <InputError message={errors.name} className="mt-2" />
+              </div>
 
-                {/* Deskripsi Proyek */}
-                <div className="space-y-3">
-                  <Label htmlFor="project_description" className="font-bold">Deskripsi <span className="text-red-500">*</span></Label>
-                  <Textarea
-                    id="project_description"
-                    placeholder="Jelaskan tujuan dan ruang lingkup proyek ini..."
-                    className="min-h-[120px] shadow-sm focus:ring-primary/20 leading-relaxed"
-                    value={data.description}
-                    onChange={(e) => setData("description", e.target.value)}
-                    required
-                  />
-                  <InputError message={errors.description} />
-                </div>
+              {/* Project Description */}
+              <div className="space-y-2">
+                <Label htmlFor="project_description">
+                  Project Description <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="project_description"
+                  value={data.description}
+                  onChange={(e) => setData("description", e.target.value)}
+                  required
+                />
+                <InputError message={errors.description} className="mt-2" />
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Deadline */}
-                  <div className="space-y-3">
-                    <Label htmlFor="project_due_date" className="flex items-center gap-2 font-bold">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      Tenggat Waktu <span className="text-xs font-normal text-muted-foreground">(Opsional)</span>
-                    </Label>
-                    <DateTimePicker
-                      className="w-full h-11"
-                      value={data.due_date ? new Date(data.due_date) : undefined}
-                      onChange={(date) =>
-                        setData("due_date", date ? date.toISOString() : "")
-                      }
-                    />
-                    <InputError message={errors.due_date} />
-                  </div>
+              {/* Project Deadline with DateTime Picker */}
+              <div className="space-y-2">
+                <Label htmlFor="project_due_date">
+                  Project Deadline{" "}
+                  <span className="text-muted-foreground">(Optional)</span>
+                </Label>
+                <DateTimePicker
+                  className="w-full"
+                  value={data.due_date ? new Date(data.due_date) : undefined}
+                  onChange={(date) =>
+                    setData("due_date", date ? date.toISOString() : "")
+                  }
+                />
+                <InputError message={errors.due_date} className="mt-2" />
+              </div>
 
-                  {/* Status */}
-                  <div className="space-y-3">
-                    <Label htmlFor="project_status" className="font-bold">Status Awal <span className="text-red-500">*</span></Label>
-                    <Select
-                      onValueChange={(value) => setData("status", value)}
-                      defaultValue={data.status}
-                      required
-                    >
-                      <SelectTrigger className="h-11 shadow-sm">
-                        <SelectValue placeholder="Pilih Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getStatusOptions().map(({ value, label }) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <InputError message={errors.status} />
-                  </div>
-                </div>
+              {/* Project Status */}
+              <div className="space-y-2">
+                <Label htmlFor="project_status">
+                  Project Status <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  onValueChange={(value) => setData("status", value)}
+                  defaultValue={data.status}
+                  required
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getStatusOptions().map(({ value, label }) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <InputError message={errors.status} className="mt-2" />
+              </div>
 
-                {/* Tombol Aksi */}
-                <div className="flex items-center justify-end gap-3 border-t pt-8">
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    className="font-semibold"
-                    onClick={() => window.history.back()}
-                  >
-                    Batal
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    size="lg"
-                    className="px-8 font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
-                    disabled={processing}
-                  >
-                    {processing ? "Memproses..." : "Simpan Proyek"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+              {/* Actions */}
+              <div className="flex justify-end space-x-4">
+                <Button variant="secondary" onClick={() => window.history.back()}>
+                  Cancel
+                </Button>
+                <Button type="submit">Submit</Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </AuthenticatedLayout>

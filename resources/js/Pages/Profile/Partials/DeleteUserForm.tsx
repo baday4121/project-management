@@ -14,6 +14,7 @@ import InputError from "@/Components/InputError";
 import { Label } from "@/Components/ui/label";
 import { Input } from "@/Components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { AlertTriangle, Trash2 } from "lucide-react";
 
 export default function DeleteUserForm({ className = "" }: { className?: string }) {
   const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
@@ -46,9 +47,9 @@ export default function DeleteUserForm({ className = "" }: { className?: string 
       onError: () => {
         passwordInput.current?.focus();
         toast({
-          title: "Error",
+          title: "Gagal",
           variant: "destructive",
-          description: "Failed to delete your account. Please try again.",
+          description: "Gagal menghapus akun. Silakan periksa kembali kata sandi Anda.",
         });
       },
       onFinish: () => {
@@ -59,66 +60,80 @@ export default function DeleteUserForm({ className = "" }: { className?: string 
 
   const closeModal = () => {
     setConfirmingUserDeletion(false);
-
     clearErrors();
     reset();
   };
 
   return (
     <section className={`space-y-6 ${className}`}>
-      <header>
-        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-          Delete Account
-        </h2>
-
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Once your account is deleted, all of its resources and data will be
-          permanently deleted. Before deleting your account, please download any data
-          or information that you wish to retain.
-        </p>
+      <header className="flex items-start gap-4">
+        <div className="rounded-full bg-destructive/10 p-3">
+          <Trash2 className="h-6 w-6 text-destructive" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            Hapus Akun
+          </h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 max-w-2xl leading-relaxed">
+            Setelah akun Anda dihapus, semua sumber daya dan data di dalamnya akan dihapus secara permanen. 
+            Sebelum melanjutkan, harap unduh data atau informasi apa pun yang ingin Anda simpan.
+          </p>
+        </div>
       </header>
 
-      <Button variant="destructive" onClick={confirmUserDeletion}>
-        Delete Account
+      <Button variant="destructive" onClick={confirmUserDeletion} className="px-6 font-bold shadow-lg shadow-destructive/20 transition-all hover:scale-105">
+        Hapus Akun Permanen
       </Button>
 
       <AlertDialog
         open={confirmingUserDeletion}
         onOpenChange={setConfirmingUserDeletion}
       >
-        <AlertDialogContent>
-          <AlertDialogTitle className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Are you sure you want to delete your account?
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            Once your account is deleted, all of its resources and data will be
-            permanently deleted. Please enter your password to confirm you would like
-            to permanently delete your account.
-          </AlertDialogDescription>
-          <form onSubmit={deleteUser}>
-            <Label htmlFor="password_delete">Password</Label>
-            <Input
-              id="password_delete"
-              type="password"
-              name="password"
-              ref={passwordInput}
-              value={data.password}
-              onChange={(e) => setData("password", e.target.value)}
-              className="mt-1 block w-full"
-              placeholder="Password"
-            />
+        <AlertDialogContent className="max-w-md border-none shadow-2xl">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="rounded-full bg-destructive/10 p-4 animate-bounce">
+              <AlertTriangle className="h-8 w-8 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-2xl font-black tracking-tight text-gray-900 dark:text-gray-100">
+              Apakah Anda yakin?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-muted-foreground">
+              Tindakan ini tidak dapat dibatalkan. Semua data Anda di **Workdei** akan hilang selamanya. 
+              Silakan masukkan kata sandi Anda untuk konfirmasi akhir.
+            </AlertDialogDescription>
+          </div>
 
-            <InputError message={errors.password} className="mt-2" />
+          <form onSubmit={deleteUser} className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password_delete" className="font-bold">Kata Sandi Konfirmasi</Label>
+              <Input
+                id="password_delete"
+                type="password"
+                name="password"
+                ref={passwordInput}
+                value={data.password}
+                onChange={(e) => setData("password", e.target.value)}
+                className="h-11 focus:ring-destructive/20"
+                placeholder="Masukkan kata sandi Anda"
+              />
+              <InputError message={errors.password} />
+            </div>
 
-            <AlertDialogFooter className="mt-6 flex justify-end">
-              <AlertDialogCancel onClick={closeModal}>Cancel</AlertDialogCancel>
+            <AlertDialogFooter className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <AlertDialogCancel 
+                onClick={closeModal} 
+                className="h-11 border-none bg-muted/50 hover:bg-muted font-bold"
+              >
+                Batalkan
+              </AlertDialogCancel>
               <AlertDialogAction asChild>
                 <Button
                   variant="destructive"
+                  className="h-11 px-8 font-black shadow-lg shadow-destructive/20"
                   disabled={processing}
                   onClick={deleteUser}
                 >
-                  Delete Account
+                  {processing ? "Menghapus..." : "Ya, Hapus Akun Saya"}
                 </Button>
               </AlertDialogAction>
             </AlertDialogFooter>

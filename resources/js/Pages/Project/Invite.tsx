@@ -13,6 +13,7 @@ import { PaginatedProject, Project } from "@/types/project";
 import { FilterableColumn } from "@/types/utils";
 import { useEffect } from "react";
 import { formatDate } from "@/utils/helpers";
+import { Check, X, MailOpen } from "lucide-react";
 
 type PageProps = {
   invitations: PaginatedProject;
@@ -20,13 +21,25 @@ type PageProps = {
   queryParams: { [key: string]: any } | null;
 };
 
+const handleAccept = (projectId: number) => {
+  router.post(route("project.acceptInvitation", projectId), {
+    preserveScroll: true,
+  });
+};
+
+const handleReject = (projectId: number) => {
+  router.post(route("project.rejectInvitation", projectId), {
+    preserveScroll: true,
+  });
+};
+
 const columns: ColumnDef<Project, any>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project Name" />
+      <DataTableColumnHeader column={column} title="Nama Proyek" />
     ),
-    cell: ({ row }) => <span>{row.original.name}</span>,
+    cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
   },
   {
     accessorFn: (row) => row.pivot?.status,
@@ -41,6 +54,7 @@ const columns: ColumnDef<Project, any>[] = [
               status as keyof typeof INVITATION_STATUS_BADGE_MAP
             ]
           }
+          className="capitalize"
         >
           {
             INVITATION_STATUS_TEXT_MAP[
@@ -54,7 +68,7 @@ const columns: ColumnDef<Project, any>[] = [
   {
     accessorKey: "updated_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Last Updated" />
+      <DataTableColumnHeader column={column} title="Pembaruan Terakhir" />
     ),
     cell: ({ row }) => formatDate(row.original.updated_at),
     defaultHidden: true,
@@ -64,15 +78,22 @@ const columns: ColumnDef<Project, any>[] = [
     cell: ({ row }) =>
       row.original.pivot?.status === "pending" && (
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => handleAccept(row.original.id)}>
-            Accept
+          <Button 
+            size="sm" 
+            className="bg-green-600 hover:bg-green-700 shadow-sm"
+            onClick={() => handleAccept(row.original.id)}
+          >
+            <Check className="mr-1.5 h-4 w-4" />
+            Terima
           </Button>
           <Button
             variant="destructive"
             size="sm"
+            className="shadow-sm"
             onClick={() => handleReject(row.original.id)}
           >
-            Reject
+            <X className="mr-1.5 h-4 w-4" />
+            Tolak
           </Button>
         </div>
       ),
@@ -82,7 +103,7 @@ const columns: ColumnDef<Project, any>[] = [
 const filterableColumns: FilterableColumn[] = [
   {
     accessorKey: "name",
-    title: "Project Name",
+    title: "Nama Proyek",
     filterType: "text",
   },
   {
@@ -96,25 +117,13 @@ const filterableColumns: FilterableColumn[] = [
   },
 ];
 
-const handleAccept = (projectId: number) => {
-  router.post(route("project.acceptInvitation", projectId), {
-    preserveScroll: true,
-  });
-};
-
-const handleReject = (projectId: number) => {
-  router.post(route("project.rejectInvitation", projectId), {
-    preserveScroll: true,
-  });
-};
-
 export default function Invite({ invitations, success, queryParams }: PageProps) {
   const { toast } = useToast();
 
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         description: success,
         variant: "success",
       });
@@ -124,15 +133,25 @@ export default function Invite({ invitations, success, queryParams }: PageProps)
   return (
     <AuthenticatedLayout
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Project Invitations
-        </h2>
+        <div className="flex items-center gap-2">
+          <MailOpen className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
+            Undangan Proyek
+          </h2>
+        </div>
       }
     >
-      <Head title="Invitations" />
+      <Head title="Undangan Proyek" />
       <div className="py-8">
-        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 space-y-1">
+            <h3 className="text-lg font-semibold">Daftar Undangan</h3>
+            <p className="text-sm text-muted-foreground">
+              Kelola undangan kolaborasi proyek yang dikirimkan kepada Anda.
+            </p>
+          </div>
+          
+          <div className="rounded-xl border bg-card text-card-foreground shadow-md overflow-hidden">
             <div className="p-4 text-gray-900 dark:text-gray-100 sm:p-6">
               <DataTable
                 columns={columns}

@@ -38,14 +38,14 @@ export default function Index({
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         variant: "success",
         description: success,
       });
     }
     if (error) {
       toast({
-        title: "Error",
+        title: "Kesalahan",
         variant: "destructive",
         description: error,
       });
@@ -56,71 +56,70 @@ export default function Index({
     <AuthenticatedLayout
       header={
         <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Statuses for project "{project.name}"
+          Status Tugas untuk Proyek "{project.name}"
         </h2>
       }
     >
-      <Head title={`Statuses - ${project.name}`} />
+      <Head title={`Status - ${project.name}`} />
 
       <div className="py-12">
         <div className="mx-auto max-w-7xl space-y-6 px-3 sm:px-6 lg:px-8">
-          <Card>
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center md:gap-2">
                 <div>
-                  <CardTitle>Project Statuses</CardTitle>
-                  <CardDescription className="mt-1.5">
-                    Project:{" "}
+                  <CardTitle className="text-2xl font-bold">Status Proyek</CardTitle>
+                  <CardDescription className="mt-1.5 text-base">
+                    Proyek:{" "}
                     <Link
-                      className="hover:underline"
+                      className="font-medium text-primary hover:underline"
                       href={route("project.show", project.id)}
                     >
-                      <span className="text-secondary-foreground">
-                        {project.name}
-                      </span>
+                      {project.name}
                     </Link>
                   </CardDescription>
                 </div>
                 <div className="flex flex-col gap-3 md:flex-row">
                   <Link href={route("project.statuses.create", project.id)}>
-                    <Button className="w-full shadow md:w-auto">
-                      <CirclePlus className="h-4 w-4" />
-                      Create Status
+                    <Button className="w-full shadow-md md:w-auto px-6">
+                      <CirclePlus className="h-4 w-4 mr-2" />
+                      Tambah Status
                     </Button>
                   </Link>
                   <Link href={route("project.show", project.id)}>
-                    <Button variant="outline" className="w-full shadow md:w-auto">
-                      <ArrowLeft className="h-4 w-4" />
-                      Back to Project
+                    <Button variant="outline" className="w-full shadow-sm md:w-auto">
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Kembali ke Proyek
                     </Button>
                   </Link>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded-lg border bg-secondary p-4 dark:bg-secondary/30">
-                <div className="flex items-center gap-1.5">
-                  <Info className="h-4 w-4" />
-                  <h4 className="font-medium">About Statuses</h4>
+              <div className="rounded-xl border bg-secondary/50 p-5 dark:bg-secondary/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Info className="h-5 w-5 text-primary" />
+                  <h4 className="font-bold text-lg">Tentang Status Tugas</h4>
                 </div>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                <ul className="list-inside list-disc space-y-2 text-sm text-muted-foreground leading-relaxed">
                   <li>
-                    Task statuses help track the progress of tasks within your
-                    project
+                    Status tugas membantu memantau progres setiap pekerjaan dalam proyek Anda.
                   </li>
-                  <li>Project managers can create and manage custom statuses</li>
-                  <li>Default statuses are available across all projects</li>
-                  <li>You cannot modify or delete default statuses</li>
+                  <li>Manajer proyek dapat membuat dan mengelola status kustom sesuai alur kerja.</li>
+                  <li>Status bawaan (*default*) tersedia secara otomatis di semua proyek.</li>
+                  <li>Status bawaan tidak dapat diubah atau dihapus untuk menjaga konsistensi sistem.</li>
                 </ul>
               </div>
             </CardContent>
           </Card>
 
-          <StatusesList
-            statuses={statuses}
-            projectId={project.id}
-            queryParams={queryParams}
-          />
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <StatusesList
+              statuses={statuses}
+              projectId={project.id}
+              queryParams={queryParams}
+            />
+          </div>
         </div>
       </div>
     </AuthenticatedLayout>

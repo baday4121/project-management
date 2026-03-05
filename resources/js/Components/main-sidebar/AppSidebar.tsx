@@ -1,4 +1,4 @@
-import { ListTodo, SquareChartGantt, Users } from "lucide-react";
+import { ListTodo, SquareChartGantt, Users, LayoutDashboard } from "lucide-react";
 import { RolesEnum } from "@/types/enums";
 
 import { NavMain } from "./NavMain";
@@ -30,40 +30,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     navMain: [
       {
-        title: "Projects",
+        title: "Beranda",
+        url: route("dashboard"),
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Proyek",
         url: route("project.index"),
         icon: SquareChartGantt,
         items: [
           {
-            title: "All Projects",
+            title: "Semua Proyek",
             url: route("project.index"),
           },
           {
-            title: "Invitations",
+            title: "Undangan",
             url: route("project.invitations"),
           },
         ],
       },
       {
-        title: "Tasks",
+        title: "Tugas",
         url: route("task.index"),
         icon: ListTodo,
         items: [
           {
-            title: "All Tasks",
+            title: "Semua Tugas",
             url: route("task.index"),
           },
           {
-            title: "My Tasks",
+            title: "Tugas Saya",
             url: route("task.myTasks"),
           },
         ],
       },
-      // Only show Users nav item if user has admin role
+      // Tampilkan menu Pengguna hanya jika user adalah admin
       ...(auth.user.roles?.includes(RolesEnum.Admin)
         ? [
             {
-              title: "Users",
+              title: "Pengguna",
               url: route("user.index"),
               icon: Users,
             },
@@ -86,16 +91,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" className="border-r border-primary/5 shadow-xl" {...props}>
       <SidebarHeader>
         <NavHeader />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="gap-2 px-2">
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
         <NavTasks tasks={data.tasks} />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t border-primary/5 bg-muted/20 pb-4">
         <NavThemeToggle />
         <NavUser user={data.user} />
       </SidebarFooter>

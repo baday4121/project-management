@@ -7,7 +7,7 @@ import InputError from "@/Components/InputError";
 import { Checkbox } from "@/Components/ui/checkbox";
 import { FormEventHandler } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert";
-import { Check, LogIn } from "lucide-react";
+import { Check, LogIn, LockKeyhole } from "lucide-react";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import {
   Card,
@@ -58,117 +58,126 @@ export default function Login({
 
   return (
     <AuthFlowLayout>
-      <Head title="Log in" />
+      <Head title="Masuk ke Akun" />
+      
       {status && (
-        <Alert className="mb-4 shadow" variant="success">
+        <Alert className="mb-6 border-none bg-green-500/10 text-green-600 shadow-sm" variant="success">
           <Check className="h-4 w-4" />
-          <AlertTitle>Success</AlertTitle>
-          <AlertDescription className="mb-1">{status}</AlertDescription>
+          <AlertTitle className="font-bold">Berhasil</AlertTitle>
+          <AlertDescription>{status}</AlertDescription>
         </Alert>
       )}
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
+
+      <Card className="border-none shadow-2xl shadow-black/5 dark:shadow-white/5">
+        <CardHeader className="space-y-1 pb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+            <LockKeyhole className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="text-3xl font-bold tracking-tight">Masuk</CardTitle>
+          <CardDescription className="text-base text-muted-foreground">
+            Masukkan email dan kata sandi Anda untuk mengakses dashboard Workdei
           </CardDescription>
         </CardHeader>
+        
         <CardContent>
-          <form onSubmit={submit} className="space-y-6">
+          <form onSubmit={submit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Alamat Email</Label>
               <Input
                 id="email"
                 type="email"
+                placeholder="nama@perusahaan.com"
                 value={data.email}
                 onChange={(e) => setData("email", e.target.value)}
                 required
+                className="h-11"
               />
-              <InputError message={errors.email} className="mt-2" />
+              <InputError message={errors.email} />
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                {canResetPassword && !isMobile && (
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Kata Sandi</Label>
+                {canResetPassword && (
                   <Link
                     href={route("password.request")}
-                    className="ml-auto inline-block text-sm text-muted-foreground underline"
+                    className="text-xs font-medium text-primary hover:underline"
                   >
-                    Forgot your password?
+                    Lupa kata sandi?
                   </Link>
                 )}
               </div>
               <Input
                 id="password"
                 type="password"
+                placeholder="••••••••"
                 value={data.password}
                 onChange={(e) => setData("password", e.target.value)}
                 required
+                className="h-11"
               />
-              <InputError message={errors.password} className="mt-2" />
-              {canResetPassword && isMobile && (
-                <Link
-                  href={route("password.request")}
-                  className="inline-block text-sm text-muted-foreground underline"
-                >
-                  Forgot your password?
-                </Link>
-              )}
+              <InputError message={errors.password} />
             </div>
 
-            <div>
-              <label className="flex items-center">
-                <Checkbox
-                  name="remember"
-                  checked={data.remember}
-                  onCheckedChange={(checked) =>
-                    setData("remember", checked === true)
-                  }
-                />
-                <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                  Remember me
-                </span>
+            <div className="flex items-center space-x-2 py-1">
+              <Checkbox
+                id="remember"
+                checked={data.remember}
+                onCheckedChange={(checked) =>
+                  setData("remember", checked === true)
+                }
+              />
+              <label
+                htmlFor="remember"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Ingat saya di perangkat ini
               </label>
             </div>
 
-            <div className="space-y-3">
-              <Button type="submit" className="flex w-full" disabled={processing}>
-                <LogIn />
-                <span>Login</span>
+            <div className="space-y-4 pt-2">
+              <Button type="submit" className="h-11 w-full text-base font-bold shadow-lg" disabled={processing}>
+                <LogIn className="mr-2 h-5 w-5" />
+                Masuk Sekarang
               </Button>
-              <div className="flex items-center gap-4">
+              
+              <div className="relative flex items-center py-2">
                 <Separator className="flex-1" />
-                <span className="text-sm uppercase tracking-widest text-muted-foreground">
-                  or
+                <span className="mx-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Atau masuk dengan
                 </span>
                 <Separator className="flex-1" />
               </div>
-              <Button
-                variant="outline"
-                className="w-full"
-                type="button"
-                onClick={() => handleSocialLogin("google")}
-              >
-                <FaGoogle />
-                <span>Sign in with Google</span>
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                className="w-full"
-                onClick={() => handleSocialLogin("github")}
-              >
-                <FaGithub />
-                <span>Sign in with Github</span>
-              </Button>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-11"
+                  type="button"
+                  onClick={() => handleSocialLogin("google")}
+                >
+                  <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
+                  Google
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-11"
+                )
+                  type="button"
+                  onClick={() => handleSocialLogin("github")}
+                >
+                  <FaGithub className="mr-2 h-4 w-4" />
+                  Github
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>
-        <CardFooter className="flex items-center justify-center gap-2 text-sm">
-          <span>Don&apos;t have an account?</span>
-          <Link href={route("register")} className="underline">
-            Sign up
+        
+        <CardFooter className="flex flex-wrap justify-center gap-1 pb-8 text-sm text-muted-foreground">
+          <span>Belum punya akun?</span>
+          <Link href={route("register")} className="font-bold text-primary hover:underline">
+            Daftar Gratis
           </Link>
         </CardFooter>
       </Card>

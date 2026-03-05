@@ -33,6 +33,7 @@ export function DataTableToolbar<TData>({
   onReset,
 }: DataTableToolbarProps<TData>) {
   const excludedParams = ["page", "per_page", "tab"];
+  
   const isFiltered = Object.keys(queryParams).some(
     (param) => !excludedParams.includes(param),
   );
@@ -57,11 +58,14 @@ export function DataTableToolbar<TData>({
   const [showAllFilters, setShowAllFilters] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isReset, setIsReset] = useState(false);
+
   const textInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const previousValues = useRef<{ [key: string]: string }>({});
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -90,7 +94,9 @@ export function DataTableToolbar<TData>({
       delete updatedParams[name];
     }
 
-    if (entityId) updatedParams.entityId = entityId;
+    if (entityId) {
+      updatedParams.entityId = entityId;
+    }
 
     router.get(route(routeName, { id: entityId }), updatedParams, {
       preserveState: true,
@@ -98,8 +104,14 @@ export function DataTableToolbar<TData>({
     });
   };
 
-  const handleDateSelect = (accessorKey: string, { from, to }: { from: Date; to: Date }) => {
-    setDateRanges((prev) => ({ ...prev, [accessorKey]: { from, to } }));
+  const handleDateSelect = (
+    accessorKey: string,
+    { from, to }: { from: Date; to: Date },
+  ) => {
+    setDateRanges((prev) => ({
+      ...prev,
+      [accessorKey]: { from, to },
+    }));
     updateQuery(accessorKey, [from.toISOString(), to.toISOString()]);
   };
 
@@ -119,34 +131,54 @@ export function DataTableToolbar<TData>({
     setTimeout(() => setIsReset(false), 100);
   };
 
-  const activeFilterableColumns = filterableColumns.filter((col) => !col.excludeFromTable);
+  const activeFilterableColumns = filterableColumns.filter(
+    (col) => !col.excludeFromTable,
+  );
+
   const shouldShowAllFiltersButton = isMobile || activeFilterableColumns.length > 3;
 
-  const visibleFilters = showAllFilters || isMobile
-    ? activeFilterableColumns
-    : activeFilterableColumns.slice(0, 3);
+  const visibleFilters =
+    showAllFilters || isMobile
+      ? activeFilterableColumns
+      : activeFilterableColumns.slice(0, 3);
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Sisi Kiri: Filter */}
-        <div className={cn(
-          "flex flex-1 flex-wrap items-center gap-2 transition-all duration-300",
-          isMobile && !showAllFilters ? "hidden" : "flex"
-        )}>
+        <div
+          className={cn(
+            "flex flex-1 flex-wrap items-center gap-2 transition-all duration-300",
+            isMobile && !showAllFilters ? "hidden" : "flex"
+          )}
+        >
+          {/* Render Filter Kolom */}
           {visibleFilters.map((column) => {
             if (column.filterType === "text") {
               return (
                 <div key={column.accessorKey} className="relative">
-                  <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input
                     placeholder={`Cari ${column.title}...`}
                     defaultValue={queryParams[column.accessorKey] || ""}
                     disabled={isLoading}
-                    ref={(el) => (textInputRefs.current[column.accessorKey] = el)}
-                    onBlur={(e) => handleTextInputChange(column.accessorKey, e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleTextInputChange(column.accessorKey, (e.target as HTMLInputElement).value)}
-                    className="h-8 w-[180px] pl-7 lg:w-[200px] text-xs shadow-sm"
+                    ref={(el) => {
+                      textInputRefs.current[column.accessorKey] = el;
+                    }}
+                    onBlur={(event) => {
+                      handleTextInputChange(
+                        column.accessorKey,
+                        (event.target as HTMLInputElement).value,
+                      );
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        handleTextInputChange(
+                          column.accessorKey,
+                          (event.target as HTMLInputElement).value,
+                        );
+                      }
+                    }}
+                    className="h-8 w-[180px] pl-8 lg:w-[220px] text-xs shadow-sm bg-background"
                   />
                 </div>
               );
@@ -159,7 +191,9 @@ export function DataTableToolbar<TData>({
                   column={table.getColumn(column.accessorKey)}
                   title={column.title}
                   options={column.options}
-                  onSelect={(values) => onFilter(column.accessorKey, values)}
+                  onSelect={(selectedValues: string[]) => {
+                    onFilter(column.accessorKey, selectedValues);
+                  }}
                   initialSelectedValues={queryParams[column.accessorKey] || []}
                   disabled={isLoading}
                   isReset={isReset}
@@ -172,13 +206,16 @@ export function DataTableToolbar<TData>({
                 <div key={column.accessorKey} className="flex items-center gap-1">
                   <CalendarDatePicker
                     date={dateRanges[column.accessorKey]}
-                    onDateSelect={(range) => handleDateSelect(column.accessorKey, range)}
-                    className="h-8 text-xs font-bold"
+                    onDateSelect={(dateRange) =>
+                      handleDateSelect(column.accessorKey, dateRange)
+                    }
+                    className="h-8 text-xs font-bold border-dashed hover:border-primary/50 transition-colors"
                     variant="outline"
                   />
                 </div>
               );
             }
+
             return null;
           })}
 
@@ -187,7 +224,7 @@ export function DataTableToolbar<TData>({
               variant="ghost"
               onClick={handleReset}
               disabled={isLoading}
-              className="h-8 px-2 text-xs font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="h-8 px-2 text-xs font-bold text-destructive hover:text-destructive hover:bg-destructive/10 animate-in fade-in zoom-in"
             >
               Atur Ulang
               <Cross2Icon className="ml-2 h-4 w-4" />
@@ -195,11 +232,10 @@ export function DataTableToolbar<TData>({
           )}
         </div>
 
-        {/* Sisi Kanan: Aksi & Opsi */}
         <div className="flex items-center gap-2 ml-auto">
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
-            <Button variant="destructive" size="sm" className="h-8 text-xs font-bold animate-in zoom-in">
-              <TrashIcon className="mr-2 h-3 w-3" />
+            <Button variant="destructive" size="sm" className="h-8 text-xs font-bold animate-in slide-in-from-right-2">
+              <TrashIcon className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
               Hapus ({table.getFilteredSelectedRowModel().rows.length})
             </Button>
           )}
@@ -211,18 +247,21 @@ export function DataTableToolbar<TData>({
               onClick={() => setShowAllFilters(!showAllFilters)}
               className={cn(
                 "h-8 text-xs font-bold transition-all",
-                showAllFilters ? "bg-muted" : "bg-background"
+                isMobile && "w-full mt-2",
+                showAllFilters ? "bg-muted text-foreground" : "bg-background"
               )}
             >
               {showAllFilters ? (
-                <>Sembunyikan Filter <FilterX className="ml-2 h-3 w-3" /></>
+                <>Sembunyikan Filter <FilterX className="ml-2 h-3.5 w-3.5" /></>
               ) : (
-                <>Semua Filter <Filter className="ml-2 h-3 w-3" /></>
+                <>Semua Filter <Filter className="ml-2 h-3.5 w-3.5" /></>
               )}
             </Button>
           )}
 
-          <DataTableViewOptions table={table} />
+          <div className="flex items-center">
+            <DataTableViewOptions table={table} />
+          </div>
         </div>
       </div>
     </div>

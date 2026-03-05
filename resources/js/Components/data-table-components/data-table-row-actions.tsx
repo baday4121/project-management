@@ -52,55 +52,54 @@ export function DataTableRowActions<TData>({
   const task = row.original as any;
   const { showConfirmation, ConfirmationDialog } = useConfirmationDialog();
 
-  // Handle different data shapes for project tasks and global tasks
   const assignedUserId = task.assigned_user_id ?? task.assignedUser?.id;
   const canBeAssigned = !assignedUserId;
   const isAssignedToCurrentUser = assignedUserId === auth.user.id;
-  const canEditTask = isAssignedToCurrentUser || canEdit; // canEdit represents project manager privileges
+  const canEditTask = isAssignedToCurrentUser || canEdit;
 
   const handleDeleteClick = () => {
     showConfirmation({
-      title: "Confirm Task Deletion",
-      description:
-        "Are you sure you want to delete this task? This action cannot be undone.",
+      title: isProjectTable ? "Hapus Proyek" : "Hapus Tugas",
+      description: isProjectTable 
+        ? "Apakah Anda yakin ingin menghapus proyek ini? Semua data di dalamnya akan hilang permanen."
+        : "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan.",
       action: () => onDelete?.(row),
-      actionText: "Delete",
+      actionText: "Ya, Hapus",
+      variant: "destructive",
     });
   };
 
   const handleAssignClick = () => {
     showConfirmation({
-      title: "Confirm Task Assignment",
-      description: "Are you sure you want to assign this task to yourself?",
+      title: "Ambil Tugas",
+      description: "Apakah Anda yakin ingin mengambil dan mengerjakan tugas ini?",
       action: () => onAssign?.(row),
-      actionText: "Assign",
+      actionText: "Ambil",
     });
   };
 
   const handleUnassignClick = () => {
     showConfirmation({
-      title: "Confirm Task Unassignment",
-      description: "Are you sure you want to unassign yourself from this task?",
+      title: "Lepas Tugas",
+      description: "Apakah Anda yakin ingin berhenti mengerjakan tugas ini?",
       action: () => onUnassign?.(row),
-      actionText: "Unassign",
+      actionText: "Lepas",
     });
   };
 
   const handleLeaveClick = () => {
     showConfirmation({
-      title: "Confirm Project Leave",
-      description: "Are you sure you want to leave this project?",
+      title: "Keluar dari Proyek",
+      description: "Apakah Anda yakin ingin keluar dari kolaborasi proyek ini?",
       action: () => onLeave?.(row),
-      actionText: "Leave",
+      actionText: "Keluar",
+      variant: "destructive",
     });
   };
 
-  // Determine if delete action should be shown
   const shouldShowDelete =
     onDelete &&
-    (isProjectTable
-      ? isCreator // For projects, only show if user is creator
-      : (task.can?.delete ?? true)); // For tasks and labels, show if explicitly allowed or default to true
+    (isProjectTable ? isCreator : (task.can?.delete ?? true));
 
   return (
     <>
@@ -108,63 +107,68 @@ export function DataTableRowActions<TData>({
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:bg-primary/10 transition-colors"
           >
             <DotsHorizontalIcon className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
+            <span className="sr-only">Buka menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          {/* Standard Actions */}
+        <DropdownMenuContent align="end" className="w-[180px] p-1.5 animate-in fade-in zoom-in duration-200">
+          
+          {/* Aksi Standar */}
           {onView && (
-            <DropdownMenuItem onClick={() => onView(row)}>
-              <Eye className="h-4 w-4" />
-              <span>View</span>
+            <DropdownMenuItem onClick={() => onView(row)} className="gap-2 cursor-pointer font-medium">
+              <Eye className="h-4 w-4 text-muted-foreground" />
+              <span>Lihat Detail</span>
             </DropdownMenuItem>
           )}
 
           {canEditTask && onEdit && (
-            <DropdownMenuItem onClick={() => onEdit(row)}>
-              <Pencil className="h-4 w-4" />
-              <span>Edit</span>
+            <DropdownMenuItem onClick={() => onEdit(row)} className="gap-2 cursor-pointer font-medium">
+              <Pencil className="h-4 w-4 text-muted-foreground" />
+              <span>Edit Data</span>
             </DropdownMenuItem>
           )}
 
           {!isProjectTable && (
             <>
               {canBeAssigned && onAssign && (
-                <DropdownMenuItem onClick={handleAssignClick}>
+                <DropdownMenuItem onClick={handleAssignClick} className="gap-2 cursor-pointer font-medium text-primary focus:text-primary">
                   <UserPlus className="h-4 w-4" />
-                  <span>Assign to me</span>
+                  <span>Ambil Tugas</span>
                 </DropdownMenuItem>
               )}
 
               {isAssignedToCurrentUser && onUnassign && (
-                <DropdownMenuItem onClick={handleUnassignClick}>
+                <DropdownMenuItem onClick={handleUnassignClick} className="gap-2 cursor-pointer font-medium text-orange-600 focus:text-orange-600">
                   <UserMinus className="h-4 w-4" />
-                  <span>Unassign</span>
+                  <span>Lepas Tugas</span>
                 </DropdownMenuItem>
               )}
             </>
           )}
 
-          {/* Custom Actions */}
+          {/* Aksi Kustom */}
           {customActions.map((action, index) => (
             <div key={index}>
-              <DropdownMenuItem onClick={() => action.onClick(row)}>
-                {action.icon && <action.icon className="h-4 w-4" />}
+              <DropdownMenuItem onClick={() => action.onClick(row)} className="gap-2 cursor-pointer font-medium">
+                {action.icon && <action.icon className="h-4 w-4 text-muted-foreground" />}
                 <span>{action.label}</span>
               </DropdownMenuItem>
               {action.showSeparator && <DropdownMenuSeparator />}
             </div>
           ))}
 
-          {isProjectTable && !isCreator && onLeave && (
+          {/* Aksi Berbahaya */}
+          {(isProjectTable && !isCreator && onLeave) && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-500" onClick={handleLeaveClick}>
+              <DropdownMenuItem 
+                className="gap-2 cursor-pointer font-bold text-destructive focus:bg-destructive focus:text-destructive-foreground" 
+                onClick={handleLeaveClick}
+              >
                 <LogOut className="h-4 w-4" />
-                <span>Leave Project</span>
+                <span>Keluar Proyek</span>
               </DropdownMenuItem>
             </>
           )}
@@ -172,10 +176,13 @@ export function DataTableRowActions<TData>({
           {shouldShowDelete && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-500" onClick={handleDeleteClick}>
+              <DropdownMenuItem 
+                className="gap-2 cursor-pointer font-bold text-destructive focus:bg-destructive focus:text-destructive-foreground" 
+                onClick={handleDeleteClick}
+              >
                 <Trash2 className="h-4 w-4" />
                 <span>
-                  {isProjectTable && isCreator ? "Delete Project" : "Delete"}
+                  {isProjectTable && isCreator ? "Hapus Proyek" : "Hapus Data"}
                 </span>
               </DropdownMenuItem>
             </>

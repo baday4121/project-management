@@ -12,6 +12,7 @@ import {
   UserMinus,
   UserPlus,
   Trash2,
+  GripVertical,
 } from "lucide-react";
 import { formatDate } from "@/utils/helpers";
 import {
@@ -60,31 +61,32 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
 
   const handleAssign = () => {
     showConfirmation({
-      title: "Confirm Task Assignment",
-      description: "Are you sure you want to assign this task to yourself?",
+      title: "Konfirmasi Penugasan",
+      description: "Apakah Anda yakin ingin mengambil tugas ini untuk dikerjakan sendiri?",
       action: () =>
         router.post(route("task.assignToMe", task.id), {}, { preserveScroll: true }),
-      actionText: "Assign",
+      actionText: "Ambil Tugas",
     });
   };
 
   const handleUnassign = () => {
     showConfirmation({
-      title: "Confirm Task Unassignment",
-      description: "Are you sure you want to unassign yourself from this task?",
+      title: "Konfirmasi Pelepasan",
+      description: "Apakah Anda yakin ingin berhenti mengerjakan tugas ini?",
       action: () =>
         router.post(route("task.unassign", task.id), {}, { preserveScroll: true }),
-      actionText: "Unassign",
+      actionText: "Lepas Tugas",
     });
   };
 
   const handleDelete = () => {
     showConfirmation({
-      title: "Delete Task",
+      title: "Hapus Tugas",
       description:
-        "Are you sure you want to delete this task? This action cannot be undone.",
+        "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini bersifat permanen.",
       action: () => router.delete(route("task.destroy", task.id)),
-      actionText: "Delete",
+      actionText: "Hapus",
+      variant: "destructive",
     });
   };
 
@@ -95,96 +97,62 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
         style={style}
         {...(canDragTask && !isUsingDropdown ? { ...attributes, ...listeners } : {})}
         className={cn(
-          "group relative rounded-md border bg-card p-3 shadow-sm hover:border-border",
-          canDragTask && !isUsingDropdown && "cursor-grab",
-          isDragging && "cursor-grabbing opacity-50",
-          !canDragTask && "opacity-80", // Visual indication that task can't be moved
+          "group relative rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/30",
+          canDragTask && !isUsingDropdown && "cursor-grab active:cursor-grabbing",
+          isDragging && "opacity-50 ring-2 ring-primary",
+          !canDragTask && "opacity-90 bg-muted/50",
         )}
       >
-        <div className="flex items-start justify-between">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                #{task.task_number}
-              </span>
-              <h4 className="line-clamp-2 flex-1 font-medium">{task.name}</h4>
-            </div>
-
+        {/* Indikator Prioritas (Opsional: Jika ada data priority) */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold text-muted-foreground tracking-wider uppercase">
+              #{task.task_number}
+            </span>
             {task.labels.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {task.labels.map((label) => (
-                  <Badge key={label.id} variant={label.variant}>
+                {task.labels.slice(0, 2).map((label) => (
+                  <Badge key={label.id} variant={label.variant} className="text-[9px] px-1.5 py-0 uppercase font-black">
                     {label.name}
                   </Badge>
                 ))}
+                {task.labels.length > 2 && (
+                  <span className="text-[10px] text-muted-foreground">+{task.labels.length - 2}</span>
+                )}
               </div>
             )}
-
-            <div className="flex items-center justify-between gap-2">
-              {task.assignedUser ? (
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={task.assignedUser.profile_picture} />
-                    <AvatarFallback>
-                      {task.assignedUser.name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm text-muted-foreground">
-                    {task.assignedUser.name}
-                  </span>
-                </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">Unassigned</span>
-              )}
-
-              {task.due_date && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <CalendarClock className="h-4 w-4" />
-                  <span>{formatDate(task.due_date)}</span>
-                </div>
-              )}
-            </div>
           </div>
 
-          <div
-            onMouseDown={(e) => e.stopPropagation()} // Prevent drag when using dropdown
-          >
+          <div onMouseDown={(e) => e.stopPropagation()}>
             <DropdownMenu onOpenChange={handleDropdownOpenChange}>
               <DropdownMenuTrigger asChild>
-                <button
-                  className="rounded p-1 hover:bg-muted"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <button className="rounded-full p-1.5 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                   <MoreHorizontal className="h-4 w-4" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => router.visit(route("task.show", task.id))}
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>View Task</span>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => router.visit(route("task.show", task.id))} className="gap-2">
+                  <Eye className="h-4 w-4" /> <span>Lihat Detail</span>
                 </DropdownMenuItem>
+                
                 {task.can.edit && (
-                  <DropdownMenuItem
-                    onClick={() => router.visit(route("task.edit", task.id))}
-                  >
-                    <Pencil className="h-4 w-4" />
-                    <span>Edit Task</span>
+                  <DropdownMenuItem onClick={() => router.visit(route("task.edit", task.id))} className="gap-2">
+                    <Pencil className="h-4 w-4" /> <span>Edit Tugas</span>
                   </DropdownMenuItem>
                 )}
+
                 {task.can.assign && (
-                  <DropdownMenuItem onClick={handleAssign}>
-                    <UserPlus className="h-4 w-4" />
-                    <span>Assign to me</span>
+                  <DropdownMenuItem onClick={handleAssign} className="gap-2 text-primary focus:text-primary">
+                    <UserPlus className="h-4 w-4" /> <span>Ambil Tugas</span>
                   </DropdownMenuItem>
                 )}
+
                 {task.can.unassign && (
-                  <DropdownMenuItem onClick={handleUnassign}>
-                    <UserMinus className="h-4 w-4" />
-                    <span>Unassign</span>
+                  <DropdownMenuItem onClick={handleUnassign} className="gap-2 text-orange-600 focus:text-orange-600">
+                    <UserMinus className="h-4 w-4" /> <span>Lepas Tugas</span>
                   </DropdownMenuItem>
                 )}
+
                 {canDragTask && (
                   <MoveTaskDialog
                     taskId={task.id}
@@ -192,15 +160,12 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
                     columns={columns}
                   />
                 )}
+
                 {task.can.delete && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={handleDelete}
-                      className="text-red-500"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span>Delete Task</span>
+                    <DropdownMenuItem onClick={handleDelete} className="gap-2 text-red-500 focus:text-red-500">
+                      <Trash2 className="h-4 w-4" /> <span>Hapus Tugas</span>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -208,6 +173,47 @@ export function TaskCard({ task, permissions, isDragging = false, columns }: Pro
             </DropdownMenu>
           </div>
         </div>
+
+        <h4 className="line-clamp-2 text-sm font-bold leading-snug mb-4 group-hover:text-primary transition-colors">
+          {task.name}
+        </h4>
+
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-dashed">
+          <div className="flex items-center gap-2">
+            {task.assignedUser ? (
+              <div className="flex items-center gap-1.5">
+                <Avatar className="h-5 w-5 border ring-1 ring-background">
+                  <AvatarImage src={task.assignedUser.profile_picture} />
+                  <AvatarFallback className="text-[10px]">{task.assignedUser.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <span className="text-[11px] font-medium text-muted-foreground max-w-[80px] truncate">
+                  {task.assignedUser.name}
+                </span>
+              </div>
+            ) : (
+              <Badge variant="outline" className="text-[10px] font-normal border-dashed text-muted-foreground px-1.5">
+                Belum Ditugaskan
+              </Badge>
+            )}
+          </div>
+
+          {task.due_date && (
+            <div className={cn(
+              "flex items-center gap-1 text-[11px] font-bold",
+              new Date(task.due_date) < new Date() ? "text-red-500" : "text-muted-foreground"
+            )}>
+              <CalendarClock className="h-3 w-3" />
+              <span>{formatDate(task.due_date)}</span>
+            </div>
+          )}
+        </div>
+        
+        {/* Handle Visual untuk Drag */}
+        {canDragTask && (
+          <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripVertical className="h-4 w-4 text-muted-foreground/30" />
+          </div>
+        )}
       </div>
       <ConfirmationDialog />
     </>

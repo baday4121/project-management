@@ -9,15 +9,8 @@ import {
   TASK_STATUS_BADGE_MAP,
 } from "@/utils/constants";
 import { Link } from "@inertiajs/react";
-import { 
-  ChevronRight, 
-  Pencil, 
-  Plus, 
-  Trash2, 
-  FolderKanban, 
-  Hash,
-  AlertTriangle
-} from "lucide-react";
+
+import { ChevronRight, Pencil, Plus, Trash2, FolderKanban, Hash } from "lucide-react";
 
 type TaskHeaderProps = {
   task: Task;
@@ -39,10 +32,10 @@ export function TaskHeader({ task }: TaskHeaderProps) {
 
   return (
     <div className="space-y-6 rounded-2xl border bg-card/50 p-5 shadow-sm backdrop-blur-sm sm:p-8 overflow-hidden relative">
-      {/* Background Accent */}
+      {/* Background Accent / Dekorasi halus */}
       <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
 
-      {/* Breadcrumb Navigation */}
+      {/* Navigasi Breadcrumb */}
       <nav className="flex items-center gap-x-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
         <Link
           href={route("project.show", task.project.id)}
@@ -60,12 +53,12 @@ export function TaskHeader({ task }: TaskHeaderProps) {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
         <div className="space-y-4">
-          {/* Task Title */}
+          {/* Judul Tugas */}
           <h1 className="text-3xl font-black tracking-tight text-foreground md:text-4xl italic">
             {task.name}
           </h1>
 
-          {/* Status & Priority Badges */}
+          {/* Badge Status & Prioritas */}
           <div className="flex flex-wrap gap-2">
             <Badge
               variant={TASK_STATUS_BADGE_MAP(task.status.slug, task.status.color)}
@@ -82,7 +75,7 @@ export function TaskHeader({ task }: TaskHeaderProps) {
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Tombol Aksi */}
         <div className="flex flex-wrap items-center gap-3 pt-2 lg:pt-0">
           <Link href={route("task.create", { project_id: task.project_id })} className="w-full sm:w-auto">
             <Button size="sm" className="w-full font-bold shadow-lg shadow-primary/20 sm:w-auto">

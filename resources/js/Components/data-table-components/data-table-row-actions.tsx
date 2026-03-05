@@ -61,39 +61,37 @@ export function DataTableRowActions<TData>({
     showConfirmation({
       title: isProjectTable ? "Hapus Proyek" : "Hapus Tugas",
       description: isProjectTable 
-        ? "Apakah Anda yakin ingin menghapus proyek ini? Semua data di dalamnya akan hilang permanen."
+        ? "Apakah Anda yakin ingin menghapus proyek ini? Semua data terkait akan ikut terhapus dan tindakan ini tidak dapat dibatalkan."
         : "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan.",
       action: () => onDelete?.(row),
       actionText: "Ya, Hapus",
-      variant: "destructive",
     });
   };
 
   const handleAssignClick = () => {
     showConfirmation({
       title: "Ambil Tugas",
-      description: "Apakah Anda yakin ingin mengambil dan mengerjakan tugas ini?",
+      description: "Apakah Anda yakin ingin menugaskan tugas ini ke akun Anda?",
       action: () => onAssign?.(row),
-      actionText: "Ambil",
+      actionText: "Tugaskan",
     });
   };
 
   const handleUnassignClick = () => {
     showConfirmation({
       title: "Lepas Tugas",
-      description: "Apakah Anda yakin ingin berhenti mengerjakan tugas ini?",
+      description: "Apakah Anda yakin ingin melepaskan diri dari tugas ini?",
       action: () => onUnassign?.(row),
-      actionText: "Lepas",
+      actionText: "Lepaskan",
     });
   };
 
   const handleLeaveClick = () => {
     showConfirmation({
-      title: "Keluar dari Proyek",
-      description: "Apakah Anda yakin ingin keluar dari kolaborasi proyek ini?",
+      title: "Keluar Proyek",
+      description: "Apakah Anda yakin ingin keluar dari proyek ini?",
       action: () => onLeave?.(row),
       actionText: "Keluar",
-      variant: "destructive",
     });
   };
 
@@ -107,85 +105,88 @@ export function DataTableRowActions<TData>({
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:bg-primary/10 transition-colors"
+            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted hover:bg-muted/80"
           >
             <DotsHorizontalIcon className="h-4 w-4" />
             <span className="sr-only">Buka menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[180px] p-1.5 animate-in fade-in zoom-in duration-200">
+        <DropdownMenuContent align="end" className="w-[180px] p-1.5 shadow-lg border-muted/50">
           
-          {/* Aksi Standar */}
+          {/* Aksi Utama */}
           {onView && (
-            <DropdownMenuItem onClick={() => onView(row)} className="gap-2 cursor-pointer font-medium">
+            <DropdownMenuItem onClick={() => onView(row)} className="gap-2 cursor-pointer">
               <Eye className="h-4 w-4 text-muted-foreground" />
               <span>Lihat Detail</span>
             </DropdownMenuItem>
           )}
 
           {canEditTask && onEdit && (
-            <DropdownMenuItem onClick={() => onEdit(row)} className="gap-2 cursor-pointer font-medium">
+            <DropdownMenuItem onClick={() => onEdit(row)} className="gap-2 cursor-pointer">
               <Pencil className="h-4 w-4 text-muted-foreground" />
-              <span>Edit Data</span>
+              <span>Ubah Data</span>
             </DropdownMenuItem>
           )}
 
           {!isProjectTable && (
             <>
               {canBeAssigned && onAssign && (
-                <DropdownMenuItem onClick={handleAssignClick} className="gap-2 cursor-pointer font-medium text-primary focus:text-primary">
+                <DropdownMenuItem onClick={handleAssignClick} className="gap-2 cursor-pointer text-primary focus:text-primary">
                   <UserPlus className="h-4 w-4" />
-                  <span>Ambil Tugas</span>
+                  <span>Tugaskan ke Saya</span>
                 </DropdownMenuItem>
               )}
 
               {isAssignedToCurrentUser && onUnassign && (
-                <DropdownMenuItem onClick={handleUnassignClick} className="gap-2 cursor-pointer font-medium text-orange-600 focus:text-orange-600">
+                <DropdownMenuItem onClick={handleUnassignClick} className="gap-2 cursor-pointer text-orange-600 focus:text-orange-600">
                   <UserMinus className="h-4 w-4" />
-                  <span>Lepas Tugas</span>
+                  <span>Lepas Penugasan</span>
                 </DropdownMenuItem>
               )}
             </>
           )}
 
           {/* Aksi Kustom */}
-          {customActions.map((action, index) => (
-            <div key={index}>
-              <DropdownMenuItem onClick={() => action.onClick(row)} className="gap-2 cursor-pointer font-medium">
-                {action.icon && <action.icon className="h-4 w-4 text-muted-foreground" />}
-                <span>{action.label}</span>
-              </DropdownMenuItem>
-              {action.showSeparator && <DropdownMenuSeparator />}
-            </div>
-          ))}
-
-          {/* Aksi Berbahaya */}
-          {(isProjectTable && !isCreator && onLeave) && (
+          {customActions.length > 0 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="gap-2 cursor-pointer font-bold text-destructive focus:bg-destructive focus:text-destructive-foreground" 
-                onClick={handleLeaveClick}
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Keluar Proyek</span>
-              </DropdownMenuItem>
+              {customActions.map((action, index) => (
+                <div key={index}>
+                  <DropdownMenuItem onClick={() => action.onClick(row)} className="gap-2 cursor-pointer">
+                    {action.icon && <action.icon className="h-4 w-4 text-muted-foreground" />}
+                    <span>{action.label}</span>
+                  </DropdownMenuItem>
+                  {action.showSeparator && <DropdownMenuSeparator />}
+                </div>
+              ))}
             </>
           )}
 
+          {/* Aksi Berbahaya / Destruktif */}
+          {((isProjectTable && !isCreator && onLeave) || shouldShowDelete) && (
+             <DropdownMenuSeparator />
+          )}
+
+          {isProjectTable && !isCreator && onLeave && (
+            <DropdownMenuItem 
+              className="text-red-500 gap-2 cursor-pointer focus:bg-red-50 focus:text-red-600" 
+              onClick={handleLeaveClick}
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Keluar Proyek</span>
+            </DropdownMenuItem>
+          )}
+
           {shouldShowDelete && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="gap-2 cursor-pointer font-bold text-destructive focus:bg-destructive focus:text-destructive-foreground" 
-                onClick={handleDeleteClick}
-              >
-                <Trash2 className="h-4 w-4" />
-                <span>
-                  {isProjectTable && isCreator ? "Hapus Proyek" : "Hapus Data"}
-                </span>
-              </DropdownMenuItem>
-            </>
+            <DropdownMenuItem 
+              className="text-red-600 font-medium gap-2 cursor-pointer focus:bg-red-50 focus:text-red-600" 
+              onClick={handleDeleteClick}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>
+                {isProjectTable && isCreator ? "Hapus Proyek" : "Hapus"}
+              </span>
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>

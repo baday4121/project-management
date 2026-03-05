@@ -6,7 +6,7 @@ import { Button } from "@/Components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { formatDate } from "@/utils/helpers";
-import { CirclePlus, UsersRound, FolderPlus } from "lucide-react";
+import { CirclePlus, UsersRound, FolderPlus, LayoutGrid, List } from "lucide-react";
 import { DataTableColumnHeader } from "@/Components/data-table-components/data-table-column-header";
 import {
   PROJECT_STATUS_BADGE_MAP,
@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 type IndexProps = {
   projects: PaginatedProject & {
     permissions: {
-      [key: number]: boolean; // project id -> canEditProject mapping
+      [key: number]: boolean;
     };
   };
   allProjects: Project[];
@@ -33,11 +33,10 @@ type IndexProps = {
   activeTab: string;
 };
 
-// Define the filterable columns and their options using constants
 const filterableColumns: FilterableColumn[] = [
   {
     accessorKey: "name",
-    title: "Name",
+    title: "Nama Proyek",
     filterType: "text",
   },
   {
@@ -51,12 +50,11 @@ const filterableColumns: FilterableColumn[] = [
   },
   {
     accessorKey: "created_at",
-    title: "Create Date",
+    title: "Tanggal Dibuat",
     filterType: "date",
   },
 ];
 
-// Main component for the Project index page
 export default function Index({ projects, queryParams, success }: IndexProps) {
   const { toast } = useToast();
   const {
@@ -68,14 +66,12 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
 
   const [activeTab, setActiveTab] = useState(initialActiveTab);
 
-  // Update the URL without making a server request
   const updateUrlWithoutRefresh = (newTab: string) => {
     const url = new URL(window.location.href);
     url.searchParams.set("tab", newTab);
     window.history.pushState({ tab: newTab }, "", url.toString());
   };
 
-  // Replace the existing handleTabChange
   const handleTabChange = (newTab: string) => {
     if (newTab !== activeTab) {
       setActiveTab(newTab);
@@ -83,7 +79,6 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
     }
   };
 
-  // Update useEffect for popstate event
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
@@ -95,7 +90,6 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  // Define the table columns for the Project data
   const columns: ColumnDef<Project, any>[] = [
     {
       accessorKey: "id",
@@ -103,9 +97,9 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
     },
     {
       accessorKey: "name",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" />,
       cell: ({ row }) => (
-        <Link href={route("project.show", row.original.id)}>
+        <Link href={route("project.show", row.original.id)} className="font-medium hover:underline text-primary">
           {row.original.name}
         </Link>
       ),
@@ -124,27 +118,27 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
     {
       accessorKey: "created_at",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Create Date" />
+        <DataTableColumnHeader column={column} title="Tanggal Dibuat" />
       ),
       cell: ({ row }) => formatDate(row.original.created_at),
     },
     {
       accessorKey: "due_date",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Due Date" />
+        <DataTableColumnHeader column={column} title="Tenggat Waktu" />
       ),
       cell: ({ row }) =>
-        row.original.due_date ? formatDate(row.original.due_date) : "No date",
+        row.original.due_date ? formatDate(row.original.due_date) : "Tanpa tenggat",
     },
     {
       accessorKey: "createdBy.name",
-      header: () => "Created By",
+      header: () => "Pemilik",
       cell: ({ row }) => row.original.createdBy.name,
     },
     {
       accessorKey: "updated_at",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Last Updated" />
+        <DataTableColumnHeader column={column} title="Pembaruan Terakhir" />
       ),
       cell: ({ row }) => formatDate(row.original.updated_at),
       defaultHidden: true,
@@ -173,7 +167,7 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         variant: "success",
         description: success,
       });
@@ -184,72 +178,80 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
     <AuthenticatedLayout
       header={
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            Projects
+          <h2 className="text-2xl font-bold leading-tight text-gray-800 dark:text-gray-200">
+            Daftar Proyek
           </h2>
         </div>
       }
     >
-      <Head title="Projects" />
+      <Head title="Proyek Saya" />
 
-      <main className="mx-auto max-w-7xl space-y-8 py-8">
-        <section className="gap-6 px-3 sm:px-6 lg:px-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage Your Projects Efficiently</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <h4>
-                Track progress, manage tasks, and collaborate with your team. Use the
-                tools provided to create, view, and update your projects seamlessly.
-              </h4>
-              <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
+      <main className="mx-auto max-w-7xl space-y-8 py-10">
+        {/* Header Section */}
+        <section className="px-4 sm:px-6 lg:px-8">
+          <Card className="border-none shadow-sm bg-gradient-to-r from-primary/5 via-transparent to-transparent">
+            <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-1">
+                <CardTitle className="text-2xl font-bold">Kelola Proyek Anda</CardTitle>
+                <p className="text-muted-foreground max-w-2xl text-lg">
+                  Pantau progres, kelola tugas, dan berkolaborasi dengan tim Anda dalam satu tempat yang efisien.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <Link href={route("project.create")}>
-                  <Button className="w-full shadow sm:w-auto">
-                    <CirclePlus className="h-5 w-5" />
-                    <span>Create Project</span>
+                  <Button className="w-full shadow-md sm:w-auto px-6 h-11 text-lg">
+                    <CirclePlus className="mr-2 h-5 w-5" />
+                    <span>Buat Proyek</span>
                   </Button>
                 </Link>
                 <Link href={route("project.invitations")}>
-                  <Button variant="secondary" className="w-full shadow sm:w-auto">
-                    <UsersRound className="h-5 w-5" />
-                    <span>Invitations</span>
+                  <Button variant="outline" className="w-full shadow-sm sm:w-auto px-6 h-11 text-lg">
+                    <UsersRound className="mr-2 h-5 w-5 text-primary" />
+                    <span>Undangan</span>
                   </Button>
                 </Link>
               </div>
-            </CardContent>
+            </CardHeader>
           </Card>
         </section>
 
         {allProjects.length > 0 ? (
-          <section className="px-3 sm:px-6 lg:px-8">
+          <section className="px-4 sm:px-6 lg:px-8">
             <Tabs
               value={activeTab}
               onValueChange={handleTabChange}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2 shadow-sm">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="list">List View</TabsTrigger>
-              </TabsList>
+              <div className="flex items-center justify-between mb-6">
+                <TabsList className="grid w-[300px] grid-cols-2 p-1 bg-muted/50">
+                  <TabsTrigger value="overview" className="flex items-center gap-2 text-md">
+                    <LayoutGrid className="h-4 w-4" /> Ringkasan
+                  </TabsTrigger>
+                  <TabsTrigger value="list" className="flex items-center gap-2 text-md">
+                    <List className="h-4 w-4" /> Tabel
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-              <TabsContent value="overview" className="mt-6">
-                <div className="flex flex-col gap-6">
+              <TabsContent value="overview" className="mt-0 focus-visible:outline-none">
+                <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
                   <ProjectCards
                     projects={allProjects}
                     permissions={projects.permissions}
                     userId={user.id}
                   />
-                  <ProjectStats projects={allProjects} />
+                  <div className="pt-4">
+                    <ProjectStats projects={allProjects} />
+                  </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="list" className="mt-6">
-                <div className="overflow-x-auto rounded-lg border bg-card text-card-foreground shadow-sm">
-                  <div className="p-4 text-gray-900 dark:text-gray-100 sm:p-6">
-                    <h3 className="mb-3 text-lg font-semibold leading-tight">
-                      All Projects
-                    </h3>
+              <TabsContent value="list" className="mt-0 focus-visible:outline-none">
+                <Card className="overflow-hidden border-none shadow-md animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold tracking-tight">Semua Proyek</h3>
+                    </div>
                     <DataTable
                       columns={columns}
                       entity={projects}
@@ -258,32 +260,31 @@ export default function Index({ projects, queryParams, success }: IndexProps) {
                       routeName="project.index"
                     />
                   </div>
-                </div>
+                </Card>
               </TabsContent>
             </Tabs>
           </section>
         ) : (
-          <section className="px-3 sm:px-6 lg:px-8">
-            <Card className="flex-1">
-              <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-                <FolderPlus className="h-8 w-8 text-muted-foreground" />
-                <div className="flex flex-col gap-1.5">
-                  <CardTitle>No Projects Yet</CardTitle>
-                  <p className="text-base text-muted-foreground">
-                    Get started by creating your first project. Projects help you
-                    organize and track your tasks efficiently.
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Link href={route("project.create")}>
-                  <Button className="w-full sm:w-auto">
-                    <CirclePlus className="h-5 w-5" />
-                    Create Your First Project
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          /* Empty State */
+          <section className="px-4 py-20 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center justify-center text-center space-y-6 max-w-md mx-auto">
+              <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center">
+                <FolderPlus className="h-12 w-12 text-primary animate-pulse" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold">Belum Ada Proyek</h3>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Mulai perjalanan produktivitas Anda dengan membuat proyek pertama. 
+                  Kelola tugas dan tim Anda dengan lebih terstruktur.
+                </p>
+              </div>
+              <Link href={route("project.create")}>
+                <Button size="lg" className="px-10 h-12 text-lg">
+                  <CirclePlus className="mr-2 h-6 w-6" />
+                  Buat Proyek Pertama
+                </Button>
+              </Link>
+            </div>
           </section>
         )}
       </main>

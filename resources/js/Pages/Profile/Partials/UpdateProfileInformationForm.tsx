@@ -39,10 +39,10 @@ export default function UpdateProfileInformationForm({
       <header className="flex items-center gap-4">
         <div>
           <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-            Profile Information
+            Informasi Profil
           </h2>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Update your account's profile information and email address.
+            Perbarui informasi profil akun dan alamat email Anda.
           </p>
         </div>
       </header>
@@ -53,15 +53,17 @@ export default function UpdateProfileInformationForm({
         encType="multipart/form-data"
       >
         <div>
-          <Label htmlFor="profile_picture">Profile Picture</Label>
-          <Avatar className="my-2 h-16 w-16">
+          <Label htmlFor="profile_picture">Foto Profil</Label>
+          <Avatar className="my-2 h-16 w-16 border border-primary/20">
             {user.profile_picture ? (
               <AvatarImage
                 src={`/storage/${user.profile_picture}`}
                 alt={user.name}
               />
             ) : (
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-primary">
+                {user.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
             )}
           </Avatar>
           <Input
@@ -79,19 +81,20 @@ export default function UpdateProfileInformationForm({
         </div>
 
         <div>
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">Nama Lengkap</Label>
           <Input
             id="name"
             value={data.name}
             onChange={(e) => setData("name", e.target.value)}
             required
             className="mt-1 block w-full"
+            placeholder="Masukkan nama lengkap Anda"
           />
           <InputError message={errors.name} className="mt-2" />
         </div>
 
         <div>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">Alamat Email</Label>
           <Input
             id="email"
             type="email"
@@ -99,6 +102,7 @@ export default function UpdateProfileInformationForm({
             onChange={(e) => setData("email", e.target.value)}
             required
             className="mt-1 block w-full"
+            placeholder="nama@contoh.com"
           />
           <InputError message={errors.email} className="mt-2" />
         </div>
@@ -106,25 +110,30 @@ export default function UpdateProfileInformationForm({
         {mustVerifyEmail && user.email_verified_at === null && (
           <div>
             <p className="text-sm text-gray-800 dark:text-gray-200">
-              Your email address is unverified.
+              Alamat email Anda belum terverifikasi.
               <Link
                 href={route("verification.send")}
                 method="post"
-                className="underline"
+                className="ml-1 underline hover:text-primary"
               >
-                Resend Verification Email
+                Klik di sini untuk mengirim ulang email verifikasi.
               </Link>
             </p>
             {status === "verification-link-sent" && (
-              <div className="text-sm font-medium text-green-600 dark:text-green-400">
-                A new verification link has been sent to your email address.
+              <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+                Link verifikasi baru telah dikirim ke alamat email Anda.
               </div>
             )}
           </div>
         )}
-        <Button type="submit" disabled={processing}>
-          Save Changes
-        </Button>
+        
+        <div className="flex items-center gap-4">
+          <Button type="submit" disabled={processing} className="px-8">
+            Simpan Perubahan
+          </Button>
+          
+          {processing && <p className="text-sm text-muted-foreground animate-pulse">Menyimpan...</p>}
+        </div>
       </form>
     </section>
   );

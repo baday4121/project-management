@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
-import { CirclePlus, UsersRound, Layout, CheckSquare } from "lucide-react";
+import { CirclePlus, UsersRound, Layout, CheckSquare, Sparkles } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { StatsCards } from "./Partials/StatsCards";
 import { ActiveTasksTable } from "./Partials/ActiveTasksTable";
@@ -49,7 +49,7 @@ export default function Dashboard({
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         variant: "success",
         description: success,
       });
@@ -62,95 +62,104 @@ export default function Dashboard({
     { slug: "completed", total: totalCompletedTasks, mine: myCompletedTasks },
   ];
 
-  // Determine default tab based on available data
   const defaultTab = "tasks";
 
   return (
     <AuthenticatedLayout
       header={
-        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-          Dashboard
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
+            Panel Utama
+          </h2>
+        </div>
       }
     >
       <Head title="Dashboard" />
 
       <div className="py-8">
-        <div className="mx-auto max-w-7xl space-y-6 px-3 sm:px-6 lg:px-8">
-          <Card>
+        <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+          
+          {/* Welcome Section */}
+          <Card className="border-none shadow-sm bg-gradient-to-br from-primary/5 via-transparent to-transparent">
             <CardHeader>
-              <CardTitle className="text-2xl">Welcome to Workdei!</CardTitle>
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+                <CardTitle className="text-2xl font-bold">Selamat Datang di Workdei!</CardTitle>
+              </div>
             </CardHeader>
             <CardContent>
-              <h4 className="mb-4">
-                Manage your projects and tasks efficiently. Start by creating a new
-                project or task, or check your pending invitations.
+              <h4 className="mb-6 text-muted-foreground text-lg leading-relaxed">
+                Kelola proyek dan tugas Anda dengan lebih efisien. Mulai dengan membuat 
+                proyek baru, tugas, atau cek undangan proyek yang tertunda.
               </h4>
-              <div className="flex flex-col gap-3 md:flex-row md:items-center">
+              <div className="flex flex-wrap gap-3">
                 <Link href={route("project.create")}>
-                  <Button className="w-full shadow sm:w-auto">
+                  <Button className="shadow-md px-6">
                     <CirclePlus className="mr-2 h-5 w-5" />
-                    <span>Create Project</span>
+                    <span>Buat Proyek</span>
                   </Button>
                 </Link>
                 <Link href={route("task.create")}>
-                  <Button className="w-full shadow sm:w-auto">
-                    <CheckSquare className="mr-2 h-5 w-5" />
-                    <span>Create Task</span>
+                  <Button variant="outline" className="shadow-sm px-6">
+                    <CheckSquare className="mr-2 h-5 w-5 text-primary" />
+                    <span>Buat Tugas</span>
                   </Button>
                 </Link>
                 <Link href={route("project.invitations")}>
-                  <Button variant="secondary" className="w-full shadow sm:w-auto">
+                  <Button variant="secondary" className="shadow-sm px-6">
                     <UsersRound className="mr-2 h-5 w-5" />
-                    <span>Invitations</span>
+                    <span>Undangan</span>
                   </Button>
                 </Link>
               </div>
             </CardContent>
           </Card>
 
+          {/* Quick Stats Grid */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Link href={route("project.index")} className="block">
-              <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <CardHeader className="flex flex-row items-center gap-3">
-                  <Layout className="h-8 w-8 text-primary" />
-                  <CardTitle className="!m-0">Projects Overview</CardTitle>
+            <Link href={route("project.index")} className="group">
+              <Card className="transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md border-none bg-card">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <Layout className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex flex-col">
+                    <CardTitle className="text-lg font-bold">Ringkasan Proyek</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Lihat dan kelola semua proyek aktif Anda
+                    </p>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    View and manage all your projects
-                  </p>
-                </CardContent>
               </Card>
             </Link>
 
-            <Link href={route("task.index")} className="block">
-              <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <CardHeader className="flex flex-row items-center gap-3">
-                  <CheckSquare className="h-8 w-8 text-primary" />
-                  <CardTitle className="!m-0">Tasks Overview</CardTitle>
+            <Link href={route("task.index")} className="group">
+              <Card className="transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md border-none bg-card">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <CheckSquare className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex flex-col">
+                    <CardTitle className="text-lg font-bold">Ringkasan Tugas</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Pantau progres tugas di seluruh proyek
+                    </p>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    View and manage all your tasks
-                  </p>
-                </CardContent>
               </Card>
             </Link>
           </div>
 
-          <Card>
+          {/* Main Content Tabs */}
+          <Card className="border-none shadow-sm">
             <CardContent className="pt-6">
               <Tabs defaultValue={defaultTab} className="w-full">
-                <TabsList
-                  className="grid w-full"
-                  style={{ gridTemplateColumns: "repeat(2, 1fr)" }}
-                >
-                  <TabsTrigger value="tasks">Active Tasks</TabsTrigger>
-                  <TabsTrigger value="stats">Statistics</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-muted/50 p-1">
+                  <TabsTrigger value="tasks" className="text-md">Tugas Aktif</TabsTrigger>
+                  <TabsTrigger value="stats" className="text-md">Statistik</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="tasks" className="mt-4">
+                <TabsContent value="tasks" className="mt-4 focus-visible:outline-none animate-in fade-in duration-500">
                   <ActiveTasksTable
                     activeTasks={activeTasks}
                     queryParams={queryParams}
@@ -161,8 +170,10 @@ export default function Dashboard({
                   />
                 </TabsContent>
 
-                <TabsContent value="stats" className="mt-4">
-                  <StatsCards stats={stats} />
+                <TabsContent value="stats" className="mt-4 focus-visible:outline-none animate-in fade-in duration-500">
+                  <div className="py-4">
+                    <StatsCards stats={stats} />
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>

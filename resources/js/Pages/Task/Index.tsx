@@ -31,7 +31,6 @@ type IndexProps = {
   statusOptions: { value: string; label: string }[];
 };
 
-// Main component for the Task index page
 export default function Index({
   tasks,
   queryParams,
@@ -48,26 +47,25 @@ export default function Index({
   const isMyTasksPage = url.endsWith("/tasks/my-tasks");
 
   const pageContent = {
-    title: isMyTasksPage ? "My Tasks" : "Tasks",
+    title: isMyTasksPage ? "Tugas Saya" : "Daftar Tugas",
     cardTitle: isMyTasksPage
-      ? "Personal Task Management"
-      : "Manage Your Tasks Effectively",
+      ? "Manajemen Tugas Pribadi"
+      : "Kelola Tugas Anda dengan Efektif",
     description: isMyTasksPage
-      ? "View and manage tasks assigned specifically to you across all your projects. Keep track of your personal workload and progress."
-      : "Organize your tasks, set priorities, and track progress. Use the tools provided to create, view, and update your tasks efficiently.",
+      ? "Lihat dan kelola tugas yang ditugaskan khusus untuk Anda di semua proyek. Pantau beban kerja dan progres pribadi Anda."
+      : "Atur tugas Anda, tetapkan prioritas, dan pantau progres. Gunakan alat yang tersedia untuk membuat, melihat, dan memperbarui tugas secara efisien.",
   };
 
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         variant: "success",
         description: success,
       });
     }
   }, [success]);
 
-  // Define the table columns for the Task data
   const columns = useMemo<ColumnDef<Task, any>[]>(
     () => [
       {
@@ -82,17 +80,17 @@ export default function Index({
       },
       {
         accessorKey: "task_number",
-        header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="No" />,
         cell: ({ row }) => `#${row.original.task_number}`,
       },
       {
         accessorKey: "project.name",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Project" />
+          <DataTableColumnHeader column={column} title="Proyek" />
         ),
         enableSorting: false,
         cell: ({ row }) => (
-          <Link href={route("project.show", row.original.project.id)}>
+          <Link href={route("project.show", row.original.project.id)} className="hover:underline text-primary font-medium">
             {row.original.project.name}
           </Link>
         ),
@@ -100,14 +98,14 @@ export default function Index({
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Task Name" />
+          <DataTableColumnHeader column={column} title="Nama Tugas" />
         ),
         cell: ({ row }) => (
           <Link
             className="group flex flex-col items-start gap-1.5 md:flex-row md:items-center md:justify-between"
             href={route("task.show", row.original.id)}
           >
-            <span>{row.original.name}</span>
+            <span className="font-medium group-hover:text-primary transition-colors">{row.original.name}</span>
             <div className="flex items-center gap-2">
               {row.original.labels?.slice(0, 2).map((label) => {
                 const truncatedName = useTruncate(label.name);
@@ -125,7 +123,7 @@ export default function Index({
       {
         accessorKey: "priority",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Priority" />
+          <DataTableColumnHeader column={column} title="Prioritas" />
         ),
         cell: ({ row }) => (
           <Badge variant={TASK_PRIORITY_BADGE_MAP[row.original.priority]}>
@@ -153,24 +151,24 @@ export default function Index({
       {
         accessorKey: "due_date",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Due Date" />
+          <DataTableColumnHeader column={column} title="Tenggat Waktu" />
         ),
         cell: ({ row }) =>
-          row.original.due_date ? formatDate(row.original.due_date) : "No date",
+          row.original.due_date ? formatDate(row.original.due_date) : "Tanpa tanggal",
         defaultHidden: true,
       },
       {
         accessorKey: "assignedUser.name",
         enableSorting: false,
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Assigned To" />
+          <DataTableColumnHeader column={column} title="Ditugaskan Ke" />
         ),
-        cell: ({ row }) => row.original.assignedUser?.name ?? "Unassigned",
+        cell: ({ row }) => row.original.assignedUser?.name ?? "Belum ditugaskan",
       },
       {
         accessorKey: "updated_at",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Last Updated" />
+          <DataTableColumnHeader column={column} title="Terakhir Diperbarui" />
         ),
         cell: ({ row }) => formatDate(row.original.updated_at),
         defaultHidden: true,
@@ -190,7 +188,7 @@ export default function Index({
             }}
             onDelete={(row) => {
               const taskId = row.original.id;
-              router.delete(route("task.destroy", taskId));
+              router.get(route("task.destroy", taskId));
             }}
             onAssign={(row) => {
               router.post(route("task.assignToMe", row.original.id));
@@ -214,24 +212,24 @@ export default function Index({
   const filterableColumns: FilterableColumn[] = [
     {
       accessorKey: "project_id",
-      title: "Project",
+      title: "Proyek",
       filterType: "select",
       options: projectOptions,
     },
     {
       accessorKey: "name",
-      title: "Name",
+      title: "Nama",
       filterType: "text",
     },
     {
       accessorKey: "label_ids",
-      title: "Labels",
+      title: "Label",
       filterType: "select",
       options: labelOptions,
     },
     {
       accessorKey: "priority",
-      title: "Priority",
+      title: "Prioritas",
       filterType: "select",
       options: Object.entries(TASK_PRIORITY_TEXT_MAP).map(([value, label]) => ({
         value,
@@ -246,12 +244,12 @@ export default function Index({
     },
     {
       accessorKey: "due_date",
-      title: "Due Date",
+      title: "Tenggat Waktu",
       filterType: "date",
     },
     {
       accessorKey: "created_by_name",
-      title: "Created By",
+      title: "Dibuat Oleh",
       filterType: "text",
     },
   ];
@@ -269,30 +267,31 @@ export default function Index({
       <Head title={pageContent.title} />
       <div className="py-8">
         <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-          <Card>
+          <Card className="border-none shadow-sm bg-muted/30">
             <CardHeader>
               <CardTitle>{pageContent.cardTitle}</CardTitle>
             </CardHeader>
             <CardContent>
-              <h4>{pageContent.description}</h4>
-              <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
+              <h4 className="leading-relaxed text-muted-foreground">{pageContent.description}</h4>
+              <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center">
                 <Link href={route("task.create")}>
-                  <Button className="w-full shadow sm:w-auto">
-                    <CirclePlus className="h-5 w-5" />
-                    <span>Create Task</span>
+                  <Button className="w-full shadow sm:w-auto px-6">
+                    <CirclePlus className="h-5 w-5 mr-2" />
+                    <span>Buat Tugas</span>
                   </Button>
                 </Link>
                 <Link href={route("project.index")}>
-                  <Button variant="secondary" className="w-full shadow sm:w-auto">
-                    <Layout className="h-5 w-5" />
-                    <span>View Projects</span>
+                  <Button variant="secondary" className="w-full shadow sm:w-auto px-6">
+                    <Layout className="h-5 w-5 mr-2" />
+                    <span>Lihat Proyek</span>
                   </Button>
                 </Link>
               </div>
             </CardContent>
           </Card>
-          <div className="mt-8 rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="p-6 text-gray-900 dark:text-gray-100">
+
+          <div className="mt-8 overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div className="p-4 text-gray-900 dark:text-gray-100 sm:p-6">
               <DataTable
                 columns={columns}
                 entity={tasks}

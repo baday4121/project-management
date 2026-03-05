@@ -42,7 +42,7 @@ export const Navbar = () => {
           <NavigationMenuItem className="flex items-center gap-2">
             <Link href="/" className="group flex items-center gap-2 transition-all hover:opacity-90">
               <ApplicationLogo variant="circular" className="h-9 w-9 shadow-sm" />
-              <span className="text-xl font-black tracking-tighter">Workdei.</span>
+              <span className="text-xl font-black tracking-tighter">WorkDei</span>
             </Link>
           </NavigationMenuItem>
 
@@ -96,7 +96,7 @@ export const Navbar = () => {
                 <SheetHeader className="mb-8">
                   <SheetTitle className="flex items-center gap-2">
                     <ApplicationLogo variant="circular" className="h-8 w-8" />
-                    <span className="text-xl font-black tracking-tighter">Workdei.</span>
+                    <span className="text-xl font-black tracking-tighter">WorkDei</span>
                   </SheetTitle>
                   <SheetDescription className="sr-only italic">
                     Menu navigasi mobile

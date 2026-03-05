@@ -42,7 +42,7 @@ export default function AuthFlowLayout({ children }: PropsWithChildren) {
             </div>
             <div className="space-y-1">
               <h2 className="text-4xl font-black tracking-tighter text-foreground">
-                Workdei.
+                WorkDei
               </h2>
               <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
                 Empowering teams, simplifying work.

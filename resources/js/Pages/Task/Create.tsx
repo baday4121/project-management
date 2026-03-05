@@ -99,6 +99,7 @@ export default function Create({
     );
   };
 
+  // PERBAIKAN: Menambahkan variant agar warna label sesuai settingan
   const fetchProjectLabels = async (projectId: string) => {
     if (!projectId) return;
     setIsLoadingLabels(true);
@@ -108,10 +109,11 @@ export default function Create({
         const labels = response.data.data.map((label: any) => ({
           label: label.name,
           value: label.id.toString(),
+          // Mapping variant dari database ke komponen
           variant: label.variant as TaskLabelBadgeVariant,
         }));
         setAvailableLabels(labels);
-        setKey((prev) => prev + 1);
+        setKey((prev) => prev + 1); // Memaksa MultipleSelector render ulang warna
       }
     } catch (error) {
       console.error("Gagal mengambil label proyek:", error);
@@ -251,11 +253,11 @@ export default function Create({
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Card className="border-none shadow-lg">
             <CardHeader className="border-b bg-muted/20 pb-6">
-              <CardTitle className="text-2xl font-bold">Detail Tugas</CardTitle>
+              <CardTitle className="text-2xl font-bold italic tracking-tighter">DETAIL TUGAS</CardTitle>
               <CardDescription>
                 {data.project_id 
-                  ? `Menambahkan tugas untuk proyek: ${projects.data.find((p) => p.id.toString() === data.project_id)?.name}`
-                  : "Silakan pilih proyek untuk mulai mengisi detail tugas."}
+                  ? `Proyek: ${projects.data.find((p) => p.id.toString() === data.project_id)?.name}`
+                  : "Silakan pilih proyek untuk memuat opsi label dan anggota."}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-8">
@@ -263,8 +265,8 @@ export default function Create({
                 
                 {/* Pemilihan Proyek */}
                 <div className="space-y-3">
-                  <Label htmlFor="task_project_id" className="flex items-center gap-2 font-semibold">
-                    <Layers className="h-4 w-4 text-primary" /> Proyek <span className="text-red-500">*</span>
+                  <Label htmlFor="task_project_id" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                    <Layers className="h-4 w-4 text-primary" /> PROYEK <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     onValueChange={handleProjectChange}
@@ -272,7 +274,7 @@ export default function Create({
                     disabled={isProjectSelectionDisabled}
                     required
                   >
-                    <SelectTrigger className="h-11 shadow-sm">
+                    <SelectTrigger className="h-11 shadow-sm border-primary/20">
                       <SelectValue placeholder="Pilih Proyek" />
                     </SelectTrigger>
                     <SelectContent>
@@ -292,25 +294,24 @@ export default function Create({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Nama Tugas */}
                       <div className="space-y-3">
-                        <Label htmlFor="task_name" className="flex items-center gap-2 font-semibold">
-                          <AlignLeft className="h-4 w-4 text-primary" /> Nama Tugas <span className="text-red-500">*</span>
+                        <Label htmlFor="task_name" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                          <AlignLeft className="h-4 w-4 text-primary" /> NAMA TUGAS <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="task_name"
-                          placeholder="Contoh: Desain Landing Page"
+                          placeholder="Contoh: Implementasi API Nexicon"
                           className="h-11 shadow-sm"
                           value={data.name}
                           onChange={(e) => setData("name", e.target.value)}
                           required
-                          autoFocus
                         />
                         <InputError message={errors.name} />
                       </div>
 
                       {/* Gambar Tugas */}
                       <div className="space-y-3">
-                        <Label htmlFor="task_image_path" className="flex items-center gap-2 font-semibold">
-                          <ImagePlus className="h-4 w-4 text-primary" /> Gambar Tugas <span className="text-xs font-normal text-muted-foreground ml-1">(Opsional)</span>
+                        <Label htmlFor="task_image_path" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                          <ImagePlus className="h-4 w-4 text-primary" /> LAMPIRAN GAMBAR <span className="text-[10px] font-normal lowercase">(Opsional)</span>
                         </Label>
                         <Input
                           id="task_image_path"
@@ -329,17 +330,18 @@ export default function Create({
 
                     {/* Label Tugas */}
                     <div className="space-y-3">
-                      <Label htmlFor="task_labels" className="flex items-center gap-2 font-semibold">
-                        <Tag className="h-4 w-4 text-primary" /> Label Tugas <span className="text-xs font-normal text-muted-foreground ml-1">(Opsional)</span>
+                      <Label htmlFor="task_labels" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                        <Tag className="h-4 w-4 text-primary" /> LABEL TUGAS <span className="text-[10px] font-normal lowercase">(Opsional)</span>
                       </Label>
+                      {/* MultipleSelector dengan perbaikan warna label */}
                       <MultipleSelector
                         key={key}
                         defaultOptions={availableLabels}
-                        placeholder={isLoadingLabels ? "Memuat label..." : "Pilih label..."}
+                        placeholder={isLoadingLabels ? "Memuat..." : "Pilih Label..."}
                         emptyIndicator={<span className="text-sm p-2">Label tidak ditemukan</span>}
                         onSearch={searchLabels}
                         triggerSearchOnFocus
-                        className="min-h-11 shadow-sm"
+                        className="min-h-11 shadow-sm border-primary/20"
                         onChange={(selectedLabels) =>
                           setData("label_ids", selectedLabels.map((label) => Number(label.value)))
                         }
@@ -350,10 +352,10 @@ export default function Create({
 
                     {/* Deskripsi */}
                     <div className="space-y-3">
-                      <Label htmlFor="task_description" className="flex items-center gap-2 font-semibold">
-                        <AlignLeft className="h-4 w-4 text-primary" /> Deskripsi Tugas <span className="text-red-500">*</span>
+                      <Label htmlFor="task_description" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                        <AlignLeft className="h-4 w-4 text-primary" /> DESKRIPSI TUGAS <span className="text-red-500">*</span>
                       </Label>
-                      <div className="rounded-md border shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-primary">
+                      <div className="rounded-md border border-primary/10 shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-primary">
                         <RichTextEditor
                           value={data.description}
                           onChange={(content) => setData("description", content)}
@@ -365,8 +367,8 @@ export default function Create({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {/* Deadline */}
                       <div className="space-y-3">
-                        <Label htmlFor="task_due_date" className="flex items-center gap-2 font-semibold">
-                          <Calendar className="h-4 w-4 text-primary" /> Tenggat Waktu <span className="text-xs font-normal text-muted-foreground ml-1">(Opsional)</span>
+                        <Label htmlFor="task_due_date" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                          <Calendar className="h-4 w-4 text-primary" /> TENGGAT WAKTU
                         </Label>
                         <DateTimePicker
                           className="w-full h-11"
@@ -378,9 +380,9 @@ export default function Create({
 
                       {/* Status */}
                       <div className="space-y-3">
-                        <Label htmlFor="task_status" className="flex items-center gap-2 font-semibold">
+                        <Label htmlFor="task_status" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
                           {isLoadingStatuses ? <Loader2 className="h-4 w-4 animate-spin" /> : <Layers className="h-4 w-4 text-primary" />} 
-                          Status <span className="text-red-500">*</span>
+                          STATUS <span className="text-red-500">*</span>
                         </Label>
                         <Select
                           onValueChange={(value) => setData("status_id", value)}
@@ -389,7 +391,7 @@ export default function Create({
                           required
                         >
                           <SelectTrigger className="h-11 shadow-sm">
-                            <SelectValue placeholder={isLoadingStatuses ? "Memuat..." : "Pilih Status"} />
+                            <SelectValue placeholder={isLoadingStatuses ? "..." : "Pilih Status"} />
                           </SelectTrigger>
                           <SelectContent>
                             {statusOptions.map(({ value, label }) => (
@@ -402,8 +404,8 @@ export default function Create({
 
                       {/* Prioritas */}
                       <div className="space-y-3">
-                        <Label htmlFor="task_priority" className="flex items-center gap-2 font-semibold">
-                          <Flag className="h-4 w-4 text-primary" /> Prioritas <span className="text-red-500">*</span>
+                        <Label htmlFor="task_priority" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
+                          <Flag className="h-4 w-4 text-primary" /> PRIORITAS <span className="text-red-500">*</span>
                         </Label>
                         <Select onValueChange={(value) => setData("priority", value)} defaultValue={data.priority} required>
                           <SelectTrigger className="h-11 shadow-sm">
@@ -421,9 +423,9 @@ export default function Create({
 
                     {/* Penugasan Pengguna */}
                     <div className="space-y-3">
-                      <Label htmlFor="task_assigned_user" className="flex items-center gap-2 font-semibold">
+                      <Label htmlFor="task_assigned_user" className="flex items-center gap-2 font-black uppercase text-xs tracking-widest text-muted-foreground">
                         {isLoadingUsers ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCircle className="h-4 w-4 text-primary" />}
-                        Ditugaskan Kepada <span className="text-xs font-normal text-muted-foreground ml-1">(Opsional)</span>
+                        DITUGASKAN KEPADA
                       </Label>
                       <Select
                         onValueChange={(value) => setData("assigned_user_id", value === "unassigned" ? "" : value)}
@@ -431,7 +433,7 @@ export default function Create({
                         disabled={isLoadingUsers}
                       >
                         <SelectTrigger className="h-11 shadow-sm">
-                          <SelectValue placeholder={isLoadingUsers ? "Memuat anggota..." : "Pilih Pengguna"} />
+                          <SelectValue placeholder={isLoadingUsers ? "..." : "Pilih Anggota"} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="unassigned">Belum Ditugaskan</SelectItem>
@@ -448,18 +450,19 @@ export default function Create({
                 )}
 
                 {/* Tombol Aksi */}
-                <div className="flex items-center justify-end gap-3 border-t pt-8">
+                <div className="flex items-center justify-end gap-3 border-t border-dashed pt-8">
                   <Button 
                     type="button" 
-                    variant="outline" 
+                    variant="ghost" 
                     onClick={() => window.history.back()}
                     disabled={processing}
+                    className="font-bold italic"
                   >
-                    Batal
+                    BATAL
                   </Button>
                   {showFields && (
-                    <Button type="submit" className="px-8 font-semibold" disabled={processing}>
-                      {processing ? "Memproses..." : "Buat Tugas"}
+                    <Button type="submit" className="px-10 font-black italic shadow-lg shadow-primary/20" disabled={processing}>
+                      {processing ? "MEMPROSES..." : "SIMPAN TUGAS"}
                     </Button>
                   )}
                 </div>

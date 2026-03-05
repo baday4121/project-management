@@ -4,17 +4,18 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
-import { TrashIcon } from "lucide-react";
+import { TrashIcon, Filter, FilterX, Search, Calendar as CalendarIcon } from "lucide-react";
 import { CalendarDatePicker } from "../ui/calendar-datetime-picker";
 import { useState, useEffect, useRef } from "react";
 import { router } from "@inertiajs/react";
 import { FilterableColumn, QueryParams } from "@/types/utils";
+import { cn } from "@/lib/utils";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   filterableColumns: FilterableColumn[];
   queryParams: QueryParams;
-  routeName: string; // Dynamic route to pass in Inertia router
+  routeName: string;
   entityId?: string | number;
   isLoading: boolean;
   onFilter: (name: string, value: string | string[]) => void;
@@ -31,10 +32,7 @@ export function DataTableToolbar<TData>({
   onFilter,
   onReset,
 }: DataTableToolbarProps<TData>) {
-  // Create an array of params that should not trigger the reset button
   const excludedParams = ["page", "per_page", "tab"];
-
-  // Check if there are any filter parameters (excluding pagination and sorting)
   const isFiltered = Object.keys(queryParams).some(
     (param) => !excludedParams.includes(param),
   );
@@ -56,31 +54,19 @@ export function DataTableToolbar<TData>({
       ),
   );
 
-  const [showAllFilters, setShowAllFilters] = useState(false); // State to control filter visibility
-  const [isMobile, setIsMobile] = useState(false); // State to track if the screen is below "md"
+  const [showAllFilters, setShowAllFilters] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [isReset, setIsReset] = useState(false);
-
-  // Create a ref to store references to all text inputs
   const textInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
-
-  // Store previous values to compare against
   const previousValues = useRef<{ [key: string]: string }>({});
 
   useEffect(() => {
-    // Handler to detect screen width changes and set mobile state
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768); // 'md' breakpoint is usually 768px
-    };
-
-    handleResize(); // Initialize on component mount
-    window.addEventListener("resize", handleResize); // Attach the event listener
-
-    return () => {
-      window.removeEventListener("resize", handleResize); // Cleanup on component unmount
-    };
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Initialize previous values from queryParams
   useEffect(() => {
     previousValues.current = Object.keys(queryParams).reduce(
       (acc, key) => {
@@ -91,22 +77,20 @@ export function DataTableToolbar<TData>({
       },
       {} as { [key: string]: string },
     );
-  }, []);
+  }, [queryParams]);
 
   const updateQuery = (name: string, value: string | string[]) => {
     const updatedParams = {
       ...queryParams,
       [name]: value,
-      page: queryParams.page || 1, // Ensure page is preserved
+      page: queryParams.page || 1,
     };
 
     if (!value || (Array.isArray(value) && value.length === 0)) {
-      delete updatedParams[name]; // Remove param if value is empty
+      delete updatedParams[name];
     }
 
-    if (entityId) {
-      updatedParams.entityId = entityId; // Include entityId if provided
-    }
+    if (entityId) updatedParams.entityId = entityId;
 
     router.get(route(routeName, { id: entityId }), updatedParams, {
       preserveState: true,
@@ -114,89 +98,57 @@ export function DataTableToolbar<TData>({
     });
   };
 
-  const handleDateSelect = (
-    accessorKey: string,
-    { from, to }: { from: Date; to: Date },
-  ) => {
-    setDateRanges((prev) => ({
-      ...prev,
-      [accessorKey]: { from, to },
-    }));
-    updateQuery(accessorKey, [from.toISOString(), to.toISOString()]); // Apply date range query
+  const handleDateSelect = (accessorKey: string, { from, to }: { from: Date; to: Date }) => {
+    setDateRanges((prev) => ({ ...prev, [accessorKey]: { from, to } }));
+    updateQuery(accessorKey, [from.toISOString(), to.toISOString()]);
   };
 
   const handleTextInputChange = (accessorKey: string, value: string) => {
-    // Check if the value is the same as the previous one
-    if (previousValues.current[accessorKey] === value) {
-      return;
-    }
-
-    // Update previous value
+    if (previousValues.current[accessorKey] === value) return;
     previousValues.current[accessorKey] = value;
-
-    // Only trigger filter if value has changed
     onFilter(accessorKey, value);
   };
 
   const handleReset = () => {
-    // Clear all text input values
     Object.values(textInputRefs.current).forEach((input) => {
-      if (input) {
-        input.value = "";
-      }
+      if (input) input.value = "";
     });
-
     setIsReset(true);
     onReset();
     setShowAllFilters(false);
     setTimeout(() => setIsReset(false), 100);
   };
 
-  const activeFilterableColumns = filterableColumns.filter(
-    (col) => !col.excludeFromTable,
-  );
+  const activeFilterableColumns = filterableColumns.filter((col) => !col.excludeFromTable);
+  const shouldShowAllFiltersButton = isMobile || activeFilterableColumns.length > 3;
 
-  const shouldShowAllFiltersButton = isMobile || activeFilterableColumns.length > 4;
-
-  const visibleFilters =
-    showAllFilters || isMobile
-      ? activeFilterableColumns
-      : activeFilterableColumns.slice(0, 4);
+  const visibleFilters = showAllFilters || isMobile
+    ? activeFilterableColumns
+    : activeFilterableColumns.slice(0, 3);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between">
-        <div
-          className={`flex flex-1 flex-wrap items-center gap-2 ${isMobile && !showAllFilters ? "hidden" : ""}`}
-        >
-          {/* Loop through visible filterable columns */}
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Sisi Kiri: Filter */}
+        <div className={cn(
+          "flex flex-1 flex-wrap items-center gap-2 transition-all duration-300",
+          isMobile && !showAllFilters ? "hidden" : "flex"
+        )}>
           {visibleFilters.map((column) => {
             if (column.filterType === "text") {
               return (
-                <Input
-                  key={column.accessorKey}
-                  placeholder={`Filter by ${column.title}`}
-                  defaultValue={queryParams[column.accessorKey] || ""}
-                  disabled={isLoading}
-                  ref={(el) => {
-                    textInputRefs.current[column.accessorKey] = el;
-                  }}
-                  onBlur={(event) => {
-                    handleTextInputChange(
-                      column.accessorKey,
-                      (event.target as HTMLInputElement).value,
-                    );
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      handleTextInputChange(
-                        column.accessorKey,
-                        (event.target as HTMLInputElement).value,
-                      );
-                    }
-                  }}
-                  className="h-8 w-[150px] lg:w-[170px]"
-                />
+                <div key={column.accessorKey} className="relative">
+                  <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
+                  <Input
+                    placeholder={`Cari ${column.title}...`}
+                    defaultValue={queryParams[column.accessorKey] || ""}
+                    disabled={isLoading}
+                    ref={(el) => (textInputRefs.current[column.accessorKey] = el)}
+                    onBlur={(e) => handleTextInputChange(column.accessorKey, e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleTextInputChange(column.accessorKey, (e.target as HTMLInputElement).value)}
+                    className="h-8 w-[180px] pl-7 lg:w-[200px] text-xs shadow-sm"
+                  />
+                </div>
               );
             }
 
@@ -207,9 +159,7 @@ export function DataTableToolbar<TData>({
                   column={table.getColumn(column.accessorKey)}
                   title={column.title}
                   options={column.options}
-                  onSelect={(selectedValues: string[]) => {
-                    onFilter(column.accessorKey, selectedValues);
-                  }}
+                  onSelect={(values) => onFilter(column.accessorKey, values)}
                   initialSelectedValues={queryParams[column.accessorKey] || []}
                   disabled={isLoading}
                   isReset={isReset}
@@ -219,49 +169,56 @@ export function DataTableToolbar<TData>({
 
             if (column.filterType === "date") {
               return (
-                <CalendarDatePicker
-                  key={column.accessorKey}
-                  date={dateRanges[column.accessorKey]}
-                  onDateSelect={(dateRange) =>
-                    handleDateSelect(column.accessorKey, dateRange)
-                  }
-                  className="h-8"
-                  variant="outline"
-                />
+                <div key={column.accessorKey} className="flex items-center gap-1">
+                  <CalendarDatePicker
+                    date={dateRanges[column.accessorKey]}
+                    onDateSelect={(range) => handleDateSelect(column.accessorKey, range)}
+                    className="h-8 text-xs font-bold"
+                    variant="outline"
+                  />
+                </div>
               );
             }
-
             return null;
           })}
+
           {isFiltered && (
             <Button
               variant="ghost"
               onClick={handleReset}
               disabled={isLoading}
-              className="h-8 px-2 lg:px-3"
+              className="h-8 px-2 text-xs font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              Reset
+              Atur Ulang
               <Cross2Icon className="ml-2 h-4 w-4" />
             </Button>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-            <Button variant="outline" size="sm">
-              <TrashIcon className="mr-2 size-4" aria-hidden="true" />
-              Delete ({table.getFilteredSelectedRowModel().rows.length})
+        {/* Sisi Kanan: Aksi & Opsi */}
+        <div className="flex items-center gap-2 ml-auto">
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <Button variant="destructive" size="sm" className="h-8 text-xs font-bold animate-in zoom-in">
+              <TrashIcon className="mr-2 h-3 w-3" />
+              Hapus ({table.getFilteredSelectedRowModel().rows.length})
             </Button>
-          ) : null}
+          )}
 
           {shouldShowAllFiltersButton && (
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowAllFilters(!showAllFilters)}
-              className={`h-8 w-full ${isMobile && "mt-2"}`}
+              className={cn(
+                "h-8 text-xs font-bold transition-all",
+                showAllFilters ? "bg-muted" : "bg-background"
+              )}
             >
-              {showAllFilters ? "Hide Filters" : "Show All Filters"}
+              {showAllFilters ? (
+                <>Sembunyikan Filter <FilterX className="ml-2 h-3 w-3" /></>
+              ) : (
+                <>Semua Filter <Filter className="ml-2 h-3 w-3" /></>
+              )}
             </Button>
           )}
 

@@ -41,7 +41,7 @@
     <title inertia>{{ config('app.name', 'Workdei') }}</title>
 
     <!-- Application Color Theme -->
-    <meta name="theme-color" content="#7c3aed">
+    <meta name="theme-color" content="#0096ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
 

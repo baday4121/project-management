@@ -1,4 +1,4 @@
-import { Eye, MoreHorizontal, Pencil, Trash2, UserMinus } from "lucide-react";
+import { Eye, MoreHorizontal, Pencil, Trash2, UserMinus, ListTodo } from "lucide-react";
 import { Link, router } from "@inertiajs/react";
 import { useConfirmationDialog } from "@/hooks/useConfirmationDialog";
 import { Badge } from "@/Components/ui/badge";
@@ -41,83 +41,97 @@ export function NavTasks({ tasks }: { tasks: TaskWithPermissions[] }) {
 
   const handleDeleteClick = (taskId: string) => {
     showConfirmation({
-      title: "Confirm Task Deletion",
+      title: "Konfirmasi Penghapusan Tugas",
       description:
-        "Are you sure you want to delete this task? This action cannot be undone.",
+        "Apakah Anda yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan.",
       action: () => router.delete(route("task.destroy", taskId)),
-      actionText: "Delete",
+      actionText: "Hapus",
     });
   };
 
   const handleUnassignClick = (taskId: string) => {
     showConfirmation({
-      title: "Confirm Task Unassignment",
-      description: "Are you sure you want to unassign yourself from this task?",
+      title: "Konfirmasi Pelepasan Tugas",
+      description: "Apakah Anda yakin ingin berhenti mengerjakan tugas ini?",
       action: () =>
         router.post(route("task.unassign", taskId), {
           preserveScroll: true,
         }),
-      actionText: "Unassign",
+      actionText: "Lepaskan",
     });
   };
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Recent Tasks</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+        Tugas Terbaru
+      </SidebarGroupLabel>
       <SidebarMenu>
         {tasks.map((item, index) => (
           <SidebarMenuItem key={`${item.name}-${index}`} title={item.name}>
-            <SidebarMenuButton asChild>
-              <Link href={item.url}>
-                {item.labels.slice(0, 1).map((label) => (
-                  <Badge key={label.id} variant={label.variant} size="small">
-                    {truncateText(label.name)}
-                  </Badge>
-                ))}
-                <span>{item.name}</span>
+            <SidebarMenuButton asChild className="transition-colors hover:bg-primary/5">
+              <Link href={item.url} className="flex items-center gap-2">
+                <div className="flex shrink-0 gap-1">
+                  {item.labels.slice(0, 1).map((label) => (
+                    <Badge 
+                      key={label.id} 
+                      variant={label.variant} 
+                      className="px-1 py-0 text-[10px] uppercase font-bold tracking-tighter"
+                    >
+                      {truncateText(label.name, 10)}
+                    </Badge>
+                  ))}
+                  {item.labels.length === 0 && (
+                    <ListTodo className="h-3.5 w-3.5 text-muted-foreground/50" />
+                  )}
+                </div>
+                <span className="truncate font-medium">{item.name}</span>
               </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                  <span className="sr-only">More</span>
+                <SidebarMenuAction showOnHover className="hover:bg-primary/10 transition-colors">
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Menu</span>
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-48 rounded-lg"
+                className="w-56 rounded-xl shadow-xl border-primary/5"
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem onSelect={() => router.get(item.url)}>
-                  <Eye className="h-4 w-4" />
-                  <span>View Task</span>
+                <DropdownMenuItem onSelect={() => router.get(item.url)} className="gap-2 cursor-pointer">
+                  <Eye className="h-4 w-4 text-primary" />
+                  <span>Lihat Tugas</span>
                 </DropdownMenuItem>
+                
                 <DropdownMenuItem
                   onSelect={() =>
                     router.get(route("task.edit", item.url.split("/").pop()))
                   }
+                  className="gap-2 cursor-pointer"
                 >
-                  <Pencil className="h-4 w-4" />
-                  <span>Edit Task</span>
+                  <Pencil className="h-4 w-4 text-primary" />
+                  <span>Edit Tugas</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
                   onSelect={() => handleUnassignClick(item.url.split("/").pop()!)}
+                  className="gap-2 cursor-pointer"
                 >
-                  <UserMinus className="h-4 w-4" />
-                  <span>Unassign</span>
+                  <UserMinus className="h-4 w-4 text-primary" />
+                  <span>Lepas Tugas</span>
                 </DropdownMenuItem>
 
                 {item.permissions.canDelete && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-red-500"
+                      className="text-red-500 gap-2 cursor-pointer focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-950/20"
                       onSelect={() => handleDeleteClick(item.url.split("/").pop()!)}
                     >
                       <Trash2 className="h-4 w-4" />
-                      <span>Delete Task</span>
+                      <span>Hapus Tugas</span>
                     </DropdownMenuItem>
                   </>
                 )}
@@ -126,10 +140,10 @@ export function NavTasks({ tasks }: { tasks: TaskWithPermissions[] }) {
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <Link href={route("task.index")}>
-              <MoreHorizontal className="text-sidebar-foreground/70" />
-              <span>More</span>
+          <SidebarMenuButton asChild className="hover:bg-primary/5">
+            <Link href={route("task.index")} className="flex items-center gap-2">
+              <MoreHorizontal className="h-4 w-4 text-sidebar-foreground/70" />
+              <span className="text-muted-foreground">Lihat Semua</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

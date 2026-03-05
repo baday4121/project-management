@@ -9,8 +9,9 @@ import { Button } from "@/Components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, Users, UserPlus, Mail } from "lucide-react";
 import { formatDate } from "@/utils/helpers";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 
 type IndexProps = {
   users: PaginatedUser & { meta: PaginationMeta; links: PaginationLinks };
@@ -25,7 +26,7 @@ export default function Index({ users, queryParams, success }: IndexProps) {
   useEffect(() => {
     if (success) {
       toast({
-        title: "Success",
+        title: "Berhasil",
         description: success,
         variant: "success",
       });
@@ -37,11 +38,26 @@ export default function Index({ users, queryParams, success }: IndexProps) {
       {
         accessorKey: "id",
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+        defaultHidden: true,
       },
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Name" />
+          <DataTableColumnHeader column={column} title="Pengguna" />
+        ),
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9 border border-primary/10">
+              <AvatarImage src={row.original.profile_picture ? `/storage/${row.original.profile_picture}` : undefined} />
+              <AvatarFallback className="bg-primary/5 text-primary text-xs font-bold">
+                {row.original.name.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="font-semibold text-foreground">{row.original.name}</span>
+              <span className="text-xs text-muted-foreground md:hidden">{row.original.email}</span>
+            </div>
+          </div>
         ),
       },
       {
@@ -49,14 +65,20 @@ export default function Index({ users, queryParams, success }: IndexProps) {
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title="Email" />
         ),
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Mail className="h-3.5 w-3.5" />
+            <span>{row.original.email}</span>
+          </div>
+        ),
       },
       {
         accessorKey: "created_at",
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Created At" />
+          <DataTableColumnHeader column={column} title="Tanggal Bergabung" />
         ),
         cell: ({ row }) =>
-          row.original.created_at ? formatDate(row.original.created_at) : "No date",
+          row.original.created_at ? formatDate(row.original.created_at) : "Tanpa tanggal",
       },
       {
         id: "actions",
@@ -77,7 +99,7 @@ export default function Index({ users, queryParams, success }: IndexProps) {
   const filterableColumns: FilterableColumn[] = [
     {
       accessorKey: "name",
-      title: "Name",
+      title: "Nama",
       filterType: "text",
     },
     {
@@ -87,7 +109,7 @@ export default function Index({ users, queryParams, success }: IndexProps) {
     },
     {
       accessorKey: "created_at",
-      title: "Created At",
+      title: "Tanggal",
       filterType: "date",
     },
   ];
@@ -96,36 +118,43 @@ export default function Index({ users, queryParams, success }: IndexProps) {
     <AuthenticatedLayout
       header={
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            Users
+          <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-200">
+            Manajemen Pengguna
           </h2>
         </div>
       }
     >
-      <Head title="Users" />
+      <Head title="Pengguna" />
       <div className="py-8">
-        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <h4>
-                Create and manage user accounts, control access, and maintain user
-                information.
-              </h4>
-              <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center">
-                <Link href={route("user.create")}>
-                  <Button className="w-full sm:w-auto">
-                    <CirclePlus className="h-5 w-5" />
-                    <span>Create User</span>
-                  </Button>
-                </Link>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+          
+          {/* Header Stats / Info */}
+          <Card className="border-none shadow-sm bg-muted/30">
+            <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-2xl font-bold">Kelola Anggota Tim</CardTitle>
+                </div>
+                <p className="text-muted-foreground leading-relaxed max-w-2xl">
+                  Buat dan kelola akun pengguna, kontrol hak akses, dan pantau informasi anggota tim Workdei Anda dalam satu dasbor terpusat.
+                </p>
               </div>
-            </CardContent>
+              <Link href={route("user.create")}>
+                <Button className="w-full sm:w-auto shadow-md px-6">
+                  <UserPlus className="h-5 w-5 mr-2" />
+                  <span>Tambah Pengguna</span>
+                </Button>
+              </Link>
+            </CardHeader>
           </Card>
-          <div className="mt-8 rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="p-6 text-gray-900 dark:text-gray-100">
+
+          {/* Table Section */}
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+            <div className="p-0 sm:p-6">
+              <div className="p-4 sm:p-0 mb-4">
+                <h3 className="text-lg font-bold">Daftar Pengguna Aktif</h3>
+              </div>
               <DataTable
                 columns={columns}
                 entity={users}

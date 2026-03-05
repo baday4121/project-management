@@ -30,8 +30,8 @@ export const badgeVariants = cva(
           "border-amber-500 bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-300",
         indigo:
           "border-indigo-500 bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-300",
-        purple:
-          "border-purple-500 bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-300",
+        blue:
+          "border-blue-500 bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-300",
         pink: "border-pink-500 bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-200 dark:border-pink-300",
         teal: "border-teal-500 bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-200 dark:border-teal-300",
         cyan: "border-cyan-500 bg-cyan-100 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-200 dark:border-cyan-300",

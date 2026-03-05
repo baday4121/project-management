@@ -103,7 +103,7 @@ export default function Edit({ project, label }: Props) {
                     <SelectItem value="yellow">Yellow</SelectItem>
                     <SelectItem value="amber">Amber</SelectItem>
                     <SelectItem value="indigo">Indigo</SelectItem>
-                    <SelectItem value="purple">Purple</SelectItem>
+                    <SelectItem value="blue">Blue</SelectItem>
                     <SelectItem value="pink">Pink</SelectItem>
                     <SelectItem value="teal">Teal</SelectItem>
                     <SelectItem value="cyan">Cyan</SelectItem>

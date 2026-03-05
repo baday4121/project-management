@@ -77,7 +77,7 @@
 1. Clone the repository
 
 ```bash
-git clone https://github.com/stekatag/project-management-app.git
+git clone https://github.com/baday4121/project-management-app.git
 cd project-management-app
 ```
 

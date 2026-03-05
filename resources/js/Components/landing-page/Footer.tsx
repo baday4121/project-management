@@ -15,7 +15,7 @@ const footerLinks = {
   socialLinks: [
     {
       label: "View on GitHub",
-      href: "https://github.com/stekatag/project-management-app",
+      href: "https://github.com/baday4121/project-management-app",
       external: true,
       icon: <GitHubLogoIcon className="h-4 w-4" />,
     },

@@ -11,7 +11,7 @@ class TaskStatusFactory extends Factory {
     return [
       'name' => $name,
       'slug' => Str::slug($name),
-      'color' => fake()->randomElement(['red', 'blue', 'green', 'yellow', 'purple']),
+      'color' => fake()->randomElement(['red', 'blue', 'green', 'yellow', '']),
       'is_default' => false,
       'project_id' => null,
     ];

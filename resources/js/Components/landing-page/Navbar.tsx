@@ -96,7 +96,7 @@ export const Navbar = () => {
                     <Button className="w-full">Get Started</Button>
                   </Link>
                   <a
-                    href="https://github.com/stekatag/project-management-app"
+                    href="https://github.com/baday4121/project-management-app"
                     target="_blank"
                     rel="noreferrer noopener"
                     className="w-full"
@@ -126,7 +126,7 @@ export const Navbar = () => {
 
           <div className="hidden items-center gap-4 md:flex">
             <a
-              href="https://github.com/stekatag/project-management-app"
+              href="https://github.com/baday4121/project-management-app"
               target="_blank"
               rel="noreferrer noopener"
               className="hidden lg:flex"

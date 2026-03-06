@@ -52,7 +52,7 @@ const testimonials: TestimonialProps[] = [
     name: "Agus Wijaya",
     userName: "Engineering Manager",
     comment:
-      "WorkDei secara signifikan meningkatkan produktivitas Nexicon. Kemampuan memantau progres tugas secara real-time sangatlah berharga.",
+      "WorkDei secara signifikan meningkatkan produktivitas kami. Kemampuan memantau progres tugas secara real-time sangatlah berharga.",
   },
 ];
 

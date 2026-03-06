@@ -26,7 +26,7 @@ export function TaskComments({ task }: TaskCommentsProps) {
 
   const showSuccessToast = (message: string) => {
     toast({
-      title: "Success",
+      title: "Berhasil",
       description: message,
       variant: "success",
     });
@@ -34,8 +34,8 @@ export function TaskComments({ task }: TaskCommentsProps) {
 
   const showErrorToast = () => {
     toast({
-      title: "Error",
-      description: "Operation failed",
+      title: "Gagal",
+      description: "Operasi gagal dilakukan",
       variant: "destructive",
     });
   };
@@ -50,7 +50,7 @@ export function TaskComments({ task }: TaskCommentsProps) {
           const response = page.props as unknown as PageProps;
           if (response.task?.comments) {
             setComments(response.task.comments);
-            showSuccessToast(response.success || "Comment posted successfully");
+            showSuccessToast(response.success || "Komentar berhasil dikirim");
           }
         },
         onError: showErrorToast,
@@ -77,7 +77,7 @@ export function TaskComments({ task }: TaskCommentsProps) {
           }, []);
 
           setComments(updatedComments);
-          showSuccessToast("Comment deleted successfully");
+          showSuccessToast("Komentar berhasil dihapus");
         },
         onError: showErrorToast,
       },
@@ -97,7 +97,7 @@ export function TaskComments({ task }: TaskCommentsProps) {
               comment.id === commentId ? response.comment! : comment,
             );
             setComments(updatedComments);
-            showSuccessToast(response.success || "Comment updated successfully");
+            showSuccessToast(response.success || "Komentar berhasil diperbarui");
           }
         },
         onError: showErrorToast,

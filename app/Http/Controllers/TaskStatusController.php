@@ -43,12 +43,12 @@ class TaskStatusController extends Controller {
 
     $status = $this->taskStatusService->storeStatus($data);
 
-    return to_route('project.statuses.index', $project)->with('success', "Status '{$status->name}' created successfully.");
+    return to_route('project.statuses.index', $project)->with('success', "Status '{$status->name}' berhasil dibuat.");
   }
 
   public function edit(Project $project, TaskStatus $status) {
     if ($status->is_default) {
-      abort(403, 'Cannot edit default statuses.');
+      abort(403, 'Status bawaan sistem tidak dapat diubah.');
     }
 
     return Inertia::render('TaskStatuses/Edit', [
@@ -59,17 +59,17 @@ class TaskStatusController extends Controller {
 
   public function update(UpdateTaskStatusRequest $request, Project $project, TaskStatus $status) {
     if (is_null($status->project_id)) {
-      abort(403, 'Cannot edit default statuses');
+      abort(403, 'Status bawaan sistem tidak dapat diubah.');
     }
 
     $status = $this->taskStatusService->updateStatus($status, $request->validated());
     return to_route('project.statuses.index', $project)
-      ->with('success', "Status '{$status->name}' updated successfully.");
+      ->with('success', "Status '{$status->name}' berhasil diperbarui.");
   }
 
   public function destroy(Project $project, TaskStatus $status) {
     if (is_null($status->project_id)) {
-      return back()->with('error', 'Cannot delete default statuses');
+      return back()->with('error', 'Status bawaan sistem tidak dapat dihapus.');
     }
 
     try {
@@ -77,7 +77,7 @@ class TaskStatusController extends Controller {
       $this->taskStatusService->deleteStatus($status);
 
       return redirect()->route('project.statuses.index', $project)
-        ->with('success', "Status '{$name}' deleted successfully.");
+        ->with('success', "Status '{$name}' berhasil dihapus.");
     } catch (\Exception $e) {
       return redirect()->route('project.statuses.index', $project)
         ->with('error', $e->getMessage());

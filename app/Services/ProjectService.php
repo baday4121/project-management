@@ -42,12 +42,11 @@ class ProjectService extends BaseService {
         }
       ]);
 
-    // Apply filters using trait methods
     if (isset($filters['name'])) {
       $this->applyNameFilter($query, $filters['name']);
     }
     if (isset($filters['status'])) {
-      $this->applyStatusFilter($query, $filters['status'], 'project'); // Specify type as 'project'
+      $this->applyStatusFilter($query, $filters['status'], 'project'); 
     }
     if (isset($filters['created_at'])) {
       $this->applyDateRangeFilter($query, $filters['created_at'], 'created_at');
@@ -100,7 +99,6 @@ class ProjectService extends BaseService {
   public function getProjectWithTasks(Project $project, array $filters) {
     $query = $project->tasks()->with(['labels', 'project', 'assignedUser']);
 
-    // Apply filters using trait methods with explicit column names
     if (isset($filters['name'])) {
       $this->applyNameFilter($query, $filters['name'], 'tasks.name');
     }
@@ -124,15 +122,13 @@ class ProjectService extends BaseService {
     $user = User::where('email', $email)->first();
 
     if (!$user) {
-      return ['success' => false, 'message' => 'User does not exist.'];
+      return ['success' => false, 'message' => 'Pengguna tidak ditemukan.'];
     }
 
-    // Check existing invitation
     $existingInvitation = $project->invitedUsers()
       ->where('user_id', $user->id)
       ->first();
 
-    // Handle rejected invitation
     if ($existingInvitation && $existingInvitation->pivot->status === 'rejected') {
       $project->invitedUsers()->updateExistingPivot($user->id, [
         'status' => 'pending',
@@ -140,14 +136,12 @@ class ProjectService extends BaseService {
         'updated_at' => now(),
       ]);
 
-      // Send notification
       $user->notify(new ProjectInvitationNotification($project));
 
       broadcast(new ProjectInvitationRequestReceived($project, $user));
-      return ['success' => true, 'message' => 'User re-invited successfully.'];
+      return ['success' => true, 'message' => 'Undangan berhasil dikirim ulang.'];
     }
 
-    // Handle new invitation
     if (!$existingInvitation) {
       $project->invitedUsers()->attach($user->id, [
         'status' => 'pending',
@@ -156,19 +150,17 @@ class ProjectService extends BaseService {
         'updated_at' => now()
       ]);
 
-      // Send notification
       $user->notify(new ProjectInvitationNotification($project));
 
       broadcast(new ProjectInvitationRequestReceived($project, $user));
 
-      return ['success' => true, 'message' => 'User invited successfully.'];
+      return ['success' => true, 'message' => 'Undangan berhasil dikirim.'];
     }
 
-    return ['success' => false, 'message' => 'This user has already been invited.'];
+    return ['success' => false, 'message' => 'Pengguna ini sudah diundang sebelumnya.'];
   }
 
   public function getPendingInvitations(User $user, array $filters = []) {
-    // Initialize basic filters with defaults to prevent undefined array key errors
     $filters['sort_field'] = $filters['sort_field'] ?? 'created_at';
     $filters['sort_direction'] = $filters['sort_direction'] ?? 'desc';
     $filters['per_page'] = $filters['per_page'] ?? 10;
@@ -193,10 +185,9 @@ class ProjectService extends BaseService {
 
   public function leaveProject(Project $project, User $user) {
     if ($user->id === $project->created_by) {
-      return ['success' => false, 'message' => 'Project creators cannot leave their own projects. Please delete the project instead.'];
+      return ['success' => false, 'message' => 'Pemilik proyek tidak dapat keluar dari proyek mereka sendiri. Silakan hapus proyek sebagai gantinya.'];
     }
 
-    // Update all tasks assigned to this user in this project to have no assignee
     $project->tasks()
       ->where('assigned_user_id', $user->id)
       ->update([
@@ -205,14 +196,12 @@ class ProjectService extends BaseService {
         'updated_at' => now()
       ]);
 
-    // Remove user from project
     $project->invitedUsers()->detach($user->id);
 
-    return ['success' => true, 'message' => 'You have left the project.'];
+    return ['success' => true, 'message' => 'Anda telah keluar dari proyek.'];
   }
 
   public function kickMembers(Project $project, array $userIds) {
-    // Update all tasks assigned to these users in this project to have no assignee
     $project->tasks()
       ->whereIn('assigned_user_id', $userIds)
       ->update([
@@ -221,59 +210,52 @@ class ProjectService extends BaseService {
         'updated_at' => now()
       ]);
 
-    // Remove users from project
     $project->invitedUsers()->detach($userIds);
 
 
-    return ['success' => true, 'message' => 'Selected members have been removed from the project.'];
+    return ['success' => true, 'message' => 'Anggota yang dipilih telah dikeluarkan dari proyek.'];
   }
 
   public function updateUserRole(Project $project, int $userId, string $role) {
     $user = Auth::user();
     $targetUser = User::findOrFail($userId);
 
-    // Get target user's current role
     $targetUserCurrentRole = $project->acceptedUsers()
       ->where('user_id', $targetUser->id)
       ->first()
       ->pivot
       ->role;
 
-    // Check if user is trying to modify their own role
     if ($targetUser->id === $user->id) {
       return [
         'success' => false,
-        'message' => 'You cannot modify your own role.'
+        'message' => 'Anda tidak dapat mengubah peran Anda sendiri.'
       ];
     }
 
-    // Check if the user being updated is not the project creator
     if ($targetUser->id === $project->created_by) {
       return [
         'success' => false,
-        'message' => 'Cannot change role of the project creator.'
+        'message' => 'Tidak dapat mengubah peran pemilik proyek.'
       ];
     }
 
-    // Get the current user's role in the project
     $userRole = $project->acceptedUsers()
       ->where('user_id', $user->id)
       ->first()
       ->pivot
       ->role;
 
-    // Check if user has permission to manage roles (is creator or project manager)
     $isCreator = $user->id === $project->created_by;
     $isProjectManager = $userRole === RolesEnum::ProjectManager->value;
 
     if (!$isCreator && !$isProjectManager) {
       return [
         'success' => false,
-        'message' => 'You do not have permission to manage user roles.'
+        'message' => 'Anda tidak memiliki izin untuk mengelola peran pengguna.'
       ];
     }
 
-    // Only project creator can demote project managers
     if (
       $role === RolesEnum::ProjectMember->value &&
       $targetUserCurrentRole === RolesEnum::ProjectManager->value &&
@@ -281,24 +263,22 @@ class ProjectService extends BaseService {
     ) {
       return [
         'success' => false,
-        'message' => 'Only the project creator can demote project managers.'
+        'message' => 'Hanya pemilik proyek yang dapat menurunkan jabatan Manajer Proyek.'
       ];
     }
 
-    // Update the role
     $project->invitedUsers()->updateExistingPivot($userId, [
       'role' => $role,
       'updated_at' => now()
     ]);
 
 
-    // Generate appropriate success message
-    $actionType = $role === RolesEnum::ProjectManager->value ? 'promoted to' : 'changed to';
-    $roleName = $role === RolesEnum::ProjectManager->value ? 'Project Manager' : 'Project Member';
+    $actionType = $role === RolesEnum::ProjectManager->value ? 'diangkat menjadi' : 'diubah menjadi';
+    $roleName = $role === RolesEnum::ProjectManager->value ? 'Manajer Proyek' : 'Anggota Proyek';
 
     return [
       'success' => true,
-      'message' => "{$targetUser->name} has been {$actionType} {$roleName}."
+      'message' => "{$targetUser->name} telah {$actionType} {$roleName}."
     ];
   }
 }

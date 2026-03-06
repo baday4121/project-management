@@ -28,9 +28,6 @@ class TaskController extends Controller {
         $this->taskService = $taskService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index() {
         $user = Auth::user();
         $filters = request()->all();
@@ -50,16 +47,12 @@ class TaskController extends Controller {
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create() {
         $user = Auth::user();
         $projectId = request('project_id');
         $statusId = request('status_id');
         $selectedProject = $projectId ? Project::findOrFail($projectId) : null;
 
-        // Get accessible projects for the user
         $projects = Project::query()
             ->whereHas('invitedUsers', function ($query) use ($user) {
                 $query->where('user_id', $user->id)
@@ -69,20 +62,16 @@ class TaskController extends Controller {
             ->orderBy('name', 'asc')
             ->get();
 
-        // Should they be restricted to self-assignment?
         $canAssignOthers = !$selectedProject || !$selectedProject->isProjectMember($user);
 
-        // Fetch initial users if project is selected
         $users = $selectedProject ? $this->getProjectUsers($selectedProject) : collect();
 
-        // Fetch both generic labels and project-specific labels if a project is selected
         $labelsQuery = TaskLabel::whereNull('project_id');
         if ($selectedProject) {
             $labelsQuery->orWhere('project_id', $selectedProject->id);
         }
         $labels = $labelsQuery->orderBy('name', 'asc')->get();
 
-        // Always get default statuses even if no project is selected
         $statuses = $this->taskService->getStatusOptions($selectedProject);
 
         return Inertia::render('Task/Create', [
@@ -98,9 +87,6 @@ class TaskController extends Controller {
         ]);
     }
 
-    /**
-     * Get users that belong to a project
-     */
     private function getProjectUsers(?Project $project): \Illuminate\Support\Collection {
         if (!$project) {
             return collect();
@@ -108,25 +94,20 @@ class TaskController extends Controller {
 
         $user = Auth::user();
 
-        // If user is a project member, only return themselves
         if ($project->isProjectMember($user)) {
             return collect([$user]);
         }
 
-        // Otherwise, return all project users (for project managers)
         return $project->acceptedUsers()
             ->orderBy('name', 'asc')
             ->get();
     }
 
-    /**
-     * Get users for a specific project (API endpoint)
-     */
     public function getUsers(Project $project) {
         $user = Auth::user();
 
         if (!$project->acceptedUsers()->where('user_id', $user->id)->exists()) {
-            abort(403, 'You are not authorized to view project users.');
+            abort(403, 'Anda tidak memiliki otoritas untuk melihat anggota proyek.');
         }
 
         $users = $this->getProjectUsers($project);
@@ -137,23 +118,18 @@ class TaskController extends Controller {
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreTaskRequest $request) {
         $data = $request->validated();
         $user = Auth::user();
         $project = Project::findOrFail($data['project_id']);
 
-        // Validate that user is a member or manager of the project
         if (!$project->acceptedUsers()
             ->where('user_id', $user->id)
             ->whereIn('role', [RolesEnum::ProjectManager->value, RolesEnum::ProjectMember->value])
             ->exists()) {
-            abort(403, 'You cannot create tasks for this project.');
+            abort(403, 'Anda tidak dapat membuat tugas untuk proyek ini.');
         }
 
-        // If user is a project member and tries to assign to someone else, force self-assignment
         if (
             $project->isProjectMember($user) &&
             ($data['assigned_user_id'] && $data['assigned_user_id'] != $user->id)
@@ -162,12 +138,9 @@ class TaskController extends Controller {
         }
 
         $this->taskService->storeTask($data);
-        return to_route('task.index')->with('success', 'Task created successfully.');
+        return to_route('task.index')->with('success', 'Tugas berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Task $task) {
         $task->load([
             'labels',
@@ -181,25 +154,19 @@ class TaskController extends Controller {
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Task $task) {
         $user = Auth::user();
         $project = $task->project;
 
         if (!$project->canEditTask($user, $task)) {
-            abort(403, 'You are not authorized to edit this task.');
+            abort(403, 'Anda tidak memiliki otoritas untuk mengubah tugas ini.');
         }
 
-        // Project managers can always change assignee
         $canChangeAssignee = !$project->isProjectMember($user);
 
         $task->load('labels');
-        // We only need the current project for edit mode
         $projects = Project::where('id', $project->id)->get();
 
-        // Get users based on role (similar to create form)
         $users = $this->getProjectUsers($project);
 
         $projectId = $task->project_id;
@@ -208,7 +175,6 @@ class TaskController extends Controller {
             ->orderBy('name', 'asc')
             ->get();
 
-        // Get task statuses for the project
         $statuses = $this->taskService->getStatusOptions($task->project);
 
         return Inertia::render('Task/Edit', [
@@ -221,18 +187,14 @@ class TaskController extends Controller {
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateTaskRequest $request, Task $task) {
         $user = Auth::user();
         $project = $task->project;
 
         if (!$project->canEditTask($user, $task)) {
-            abort(403, 'You are not authorized to edit this task.');
+            abort(403, 'Anda tidak memiliki otoritas untuk mengubah tugas ini.');
         }
 
-        // If user is not a project manager, prevent changing the assignee
         if (!$project->canManageTask($user)) {
             unset($request['assigned_user_id']);
         }
@@ -240,23 +202,20 @@ class TaskController extends Controller {
         $data = $request->validated();
         $this->taskService->updateTask($task, $data);
 
-        return to_route('task.index')->with('success', "Task '{$task->name}' updated successfully.");
+        return to_route('task.index')->with('success', "Tugas '{$task->name}' berhasil diperbarui.");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Task $task) {
         $user = Auth::user();
         $project = $task->project;
 
         if (!$project->canDeleteTask($user, $task)) {
-            abort(403, 'You are not authorized to delete this task.');
+            abort(403, 'Anda tidak memiliki otoritas untuk menghapus tugas ini.');
         }
 
         $this->taskService->deleteTask($task);
 
-        return to_route('task.index')->with('success', "Task '{$task->name}' deleted successfully.");
+        return to_route('task.index')->with('success', "Tugas '{$task->name}' berhasil dihapus.");
     }
 
     public function myTasks() {
@@ -281,7 +240,7 @@ class TaskController extends Controller {
         $user = Auth::user();
 
         if (!$task->canBeAssignedBy($user)) {
-            abort(403, 'You cannot assign this task.');
+            abort(403, 'Anda tidak dapat menugaskan tugas ini.');
         }
 
         $task->update([
@@ -289,14 +248,14 @@ class TaskController extends Controller {
             'updated_by' => $user->id
         ]);
 
-        return back()->with('success', 'Task assigned successfully.');
+        return back()->with('success', 'Tugas berhasil ditugaskan ke Anda.');
     }
 
     public function unassign(Task $task) {
         $user = Auth::user();
 
         if (!$task->canBeUnassignedBy($user)) {
-            abort(403, 'You cannot unassign this task.');
+            abort(403, 'Anda tidak dapat melepas penugasan tugas ini.');
         }
 
         $task->update([
@@ -304,25 +263,23 @@ class TaskController extends Controller {
             'updated_by' => $user->id
         ]);
 
-        return back()->with('success', 'Task unassigned successfully.');
+        return back()->with('success', 'Penugasan tugas berhasil dilepas.');
     }
 
     public function deleteImage(Task $task) {
         $user = Auth::user();
 
         if (!$task->project->canEditTask($user, $task)) {
-            abort(403, 'You are not authorized to delete this task\'s image.');
+            abort(403, 'Anda tidak memiliki otoritas untuk menghapus gambar tugas ini.');
         }
 
-        // Delete the image file
         if ($task->image_path) {
             Storage::disk('public')->delete($task->image_path);
         }
 
-        // Update the task record
         $task->update(['image_path' => null]);
 
-        return back()->with('success', 'Task image deleted successfully.');
+        return back()->with('success', 'Gambar tugas berhasil dihapus.');
     }
 
     public function getProjectStatuses(Project $project) {

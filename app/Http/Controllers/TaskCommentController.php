@@ -14,9 +14,8 @@ class TaskCommentController extends Controller {
   use AuthorizesRequests, LoadsCommentsTrait;
 
   public function store(Request $request, Task $task) {
-    // Check if user can comment on tasks
     if (!$request->user()->can('comment_on_tasks')) {
-      abort(403, 'You cannot comment on tasks.');
+      abort(403, 'Anda tidak memiliki izin untuk memberikan komentar pada tugas.');
     }
 
     $validated = $request->validate([
@@ -24,7 +23,6 @@ class TaskCommentController extends Controller {
       'parent_id' => 'nullable|exists:task_comments,id'
     ]);
 
-    // Use global config
     $purifier = new HTMLPurifier();
     $sanitizedContent = $purifier->purify($validated['content']);
 
@@ -46,7 +44,6 @@ class TaskCommentController extends Controller {
       'content' => 'required|string'
     ]);
 
-    // Use global config
     $purifier = new HTMLPurifier();
     $sanitizedContent = $purifier->purify($validated['content']);
 
@@ -63,11 +60,10 @@ class TaskCommentController extends Controller {
   public function destroy(Task $task, TaskComment $comment) {
     $this->authorize('delete', $comment);
 
-    // Soft delete the comment and its replies
-    $comment->delete(); // This will trigger the cascade soft delete
+    $comment->delete();
 
     $task->load($this->getCommentsLoadingOptions());
 
-    return back()->with('success', 'Comment deleted successfully.');
+    return back()->with('success', 'Komentar berhasil dihapus.');
   }
 }

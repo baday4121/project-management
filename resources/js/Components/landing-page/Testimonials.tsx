@@ -1,15 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/Components/ui/card";
 import { Quote } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 interface TestimonialProps {
   image: string;
@@ -22,95 +15,104 @@ const testimonials: TestimonialProps[] = [
   {
     image: "https://i.pravatar.cc/150?img=32",
     name: "Sarah Chen",
-    userName: "Tech Lead di DevCorp",
+    userName: "Tech Lead",
     comment:
-      "WorkDei telah merevolusi cara kami menangani alur kerja proyek. Sistem manajemen tugas dan pelabelannya sangat intuitif.",
+      "WorkDei telah merevolusi cara kami menangani alur kerja proyek. Sistem manajemen tugasnya sangat intuitif dan bertenaga.",
   },
   {
     image: "https://i.pravatar.cc/150?img=41",
     name: "Budi Santoso",
     userName: "Product Manager",
     comment:
-      "Fitur kolaborasi real-time membuat tim remote kami merasa lebih terhubung dari sebelumnya. Alat yang luar biasa untuk tim modern.",
+      "Fitur kolaborasi real-time membuat tim remote kami merasa lebih terhubung. Alat yang luar biasa untuk manajemen modern.",
   },
   {
     image: "https://i.pravatar.cc/150?img=15",
     name: "Emma Thompson",
     userName: "Scrum Master",
     comment:
-      "Fitur diskusi tugas menjaga semua komunikasi proyek tetap terorganisir. Tidak ada lagi feedback yang hilang di email.",
+      "Diskusi tugas menjaga semua komunikasi tetap terorganisir. Tidak ada lagi feedback yang hilang di tumpukan email.",
   },
   {
     image: "https://i.pravatar.cc/150?img=54",
     name: "James Wilson",
     userName: "DevOps Engineer",
     comment:
-      "Interface bersih, fitur bertenaga, dan alat kolaborasi tim yang sangat baik. Tepat seperti yang kami butuhkan untuk workflow agile.",
+      "Interface bersih dan fitur bertenaga. Tepat seperti yang kami butuhkan untuk menjaga kecepatan workflow setiap hari.",
   },
   {
     image: "https://i.pravatar.cc/150?img=24",
     name: "Maria Garcia",
     userName: "Frontend Developer",
     comment:
-      "Label yang dapat dikustomisasi dan pengorganisasian tugas membuat perencanaan sprint kami jauh lebih efisien.",
+      "Pengorganisasian tugas membuat perencanaan sprint kami jauh lebih efisien dan transparan bagi seluruh anggota tim.",
   },
   {
     image: "https://i.pravatar.cc/150?img=60",
     name: "David Kim",
     userName: "Engineering Manager",
     comment:
-      "WorkDei secara signifikan meningkatkan produktivitas tim kami. Kemampuan untuk memantau tugas secara real-time sangat berharga.",
+      "WorkDei secara signifikan meningkatkan produktivitas. Kemampuan memantau tugas secara real-time sangatlah berharga.",
   },
 ];
 
 export const Testimonials = () => {
-  // Setup Autoplay dan Carousel
   const [emblaRef] = useEmblaCarousel({ loop: true, align: "start" }, [
-    Autoplay({ delay: 4000, stopOnInteraction: false }),
+    Autoplay({ delay: 5000, stopOnInteraction: false }),
   ]);
 
   return (
-    <section id="testimonials" className="container mx-auto max-w-7xl px-4 py-20">
-      <div className="mb-12 text-center">
-        <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-          Dipercaya oleh Tim{" "}
-          <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-            Seluruh Dunia
-          </span>
-        </h2>
-        <p className="mt-4 text-muted-foreground">
-          Apa kata mereka tentang pengalaman menggunakan WorkDei.
-        </p>
-      </div>
+    <section id="testimonials" className="relative overflow-hidden bg-background py-24">
+      {/* Dekorasi Latar Belakang */}
+      <div className="absolute left-1/4 top-0 -z-10 h-64 w-64 rounded-full bg-primary/5 blur-[100px]" />
+      <div className="absolute right-1/4 bottom-0 -z-10 h-64 w-64 rounded-full bg-blue-500/5 blur-[100px]" />
 
-      {/* Viewport Carousel */}
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {testimonials.map(({ image, name, userName, comment }: TestimonialProps) => (
-            <div 
-              key={userName} 
-              className="flex-[0_0_100%] min-w-0 pl-4 md:flex-[0_0_50%] lg:flex-[0_0_33.33%]"
-            >
-              <Card className="h-full border border-primary/10 bg-muted/30 shadow-sm transition-colors hover:bg-muted/50">
-                <CardHeader className="flex flex-row items-center gap-4 pb-4">
-                  <Avatar className="h-10 w-10 border border-primary/20">
-                    <AvatarImage alt={name} src={image} />
-                    <AvatarFallback>{name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <CardTitle className="text-base font-bold">{name}</CardTitle>
-                    <CardDescription className="text-xs">{userName}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="relative">
-                  <Quote className="absolute -top-2 right-4 h-6 w-6 rotate-180 text-primary/10" />
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    "{comment}"
+      <div className="container mx-auto px-4">
+        <div className="mb-16 flex flex-col items-center text-center">
+          <div className="mb-4 inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
+            Testimoni Pengguna
+          </div>
+          <h2 className="max-w-2xl text-4xl font-black tracking-tighter md:text-6xl">
+            Kisah Sukses Bersama{" "}
+            <span className="bg-gradient-to-r from-primary via-blue-400 to-primary bg-clip-text text-transparent">
+              WorkDei.
+            </span>
+          </h2>
+        </div>
+
+        {/* Viewport Carousel */}
+        <div className="cursor-grab active:cursor-grabbing" ref={emblaRef}>
+          <div className="flex">
+            {testimonials.map((item, index) => (
+              <div
+                key={index}
+                className="flex-[0_0_100%] min-w-0 px-4 md:flex-[0_0_50%] lg:flex-[0_0_33.33%]"
+              >
+                <div className="relative h-full rounded-[2.5rem] border border-primary/10 bg-gradient-to-b from-muted/50 to-background p-8 transition-all duration-500 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5">
+                  <Quote className="mb-6 h-10 w-10 text-primary/20" />
+                  
+                  <p className="mb-8 text-lg font-medium leading-relaxed italic text-foreground/90">
+                    "{item.comment}"
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
+
+                  <div className="flex items-center gap-4 border-t border-primary/5 pt-6">
+                    <Avatar className="h-12 w-12 border-2 border-background shadow-md">
+                      <AvatarImage src={item.image} alt={item.name} />
+                      <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        {item.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-left">
+                      <h4 className="font-bold text-foreground">{item.name}</h4>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        {item.userName}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

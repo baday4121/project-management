@@ -4,6 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/Components/ui/dialog";
 import { Button } from "@/Components/ui/button";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
@@ -26,6 +27,7 @@ import { router } from "@inertiajs/react";
 import { useToast } from "@/hooks/use-toast";
 import { KanbanColumn } from "@/types/kanban";
 import { cn } from "@/lib/utils";
+import { GripVertical } from "lucide-react";
 
 type SortableItemProps = {
   id: number;
@@ -33,7 +35,7 @@ type SortableItemProps = {
 };
 
 function SortableItem({ id, children }: SortableItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
 
@@ -46,12 +48,21 @@ function SortableItem({ id, children }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className="flex cursor-grab items-center gap-2 rounded-md border bg-card p-3 active:cursor-grabbing"
+      className={cn(
+        "flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors",
+        isDragging ? "z-50 border-primary bg-primary/5 shadow-lg" : "hover:border-primary/30"
+      )}
     >
-      <DragHandleDots2Icon className="h-5 w-5" />
-      {children}
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-primary transition-colors"
+      >
+        <GripVertical className="h-5 w-5" />
+      </div>
+      <div className="flex items-center gap-3 font-medium">
+        {children}
+      </div>
     </div>
   );
 }
@@ -96,15 +107,15 @@ export function ReorderColumnsDialog({ columns: initialColumns, projectId }: Pro
         onFinish: () => {
           setOpen(false);
           toast({
-            title: "Success",
-            description: "Column order updated successfully",
+            title: "Berhasil",
+            description: "Urutan kolom berhasil diperbarui",
             variant: "success",
           });
         },
         onError: () => {
           toast({
-            title: "Error",
-            description: "Failed to update column order",
+            title: "Gagal",
+            description: "Gagal memperbarui urutan kolom",
             variant: "destructive",
           });
         },
@@ -115,39 +126,46 @@ export function ReorderColumnsDialog({ columns: initialColumns, projectId }: Pro
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <DragHandleDots2Icon className="h-4 w-4" />
-          Reorder Columns
+        <Button variant="outline" className="gap-2 border-primary/20 hover:bg-primary/5">
+          <DragHandleDots2Icon className="h-4 w-4 text-primary" />
+          Atur Urutan Kolom
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Reorder Kanban Columns</DialogTitle>
+      <DialogContent className="max-h-[85vh] overflow-hidden flex flex-col sm:max-w-[450px] border-primary/10">
+        <DialogHeader className="px-1">
+          <DialogTitle className="text-xl font-bold tracking-tight">Atur Kolom Kanban</DialogTitle>
+          <DialogDescription>
+            Tarik dan lepas kolom untuk mengubah urutan tampilannya di papan kanban.
+          </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
+        
+        <div className="flex-1 overflow-y-auto py-4 px-1">
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             <SortableContext items={columns} strategy={verticalListSortingStrategy}>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {columns.map((column) => (
                   <SortableItem key={column.id} id={column.id}>
-                    <span
+                    <div
                       className={cn(
-                        "h-2 w-2 rounded-full",
-                        column.color ? `bg-${column.color}-500` : "bg-secondary",
+                        "h-3 w-3 rounded-full shadow-sm",
+                        column.color ? `bg-${column.color}-500` : "bg-muted",
                       )}
                     />
-                    <span>{column.name}</span>
+                    <span className="text-sm font-semibold tracking-wide">{column.name}</span>
                   </SortableItem>
                 ))}
               </div>
             </SortableContext>
           </DndContext>
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save Order</Button>
-          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4 border-t border-primary/5">
+          <Button variant="ghost" onClick={() => setOpen(false)} className="font-medium">
+            Batal
+          </Button>
+          <Button onClick={handleSave} className="font-bold shadow-lg shadow-primary/20">
+            Simpan Urutan
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

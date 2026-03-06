@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Relations\HasMany; // Tambahkan import ini
 
 class User extends Authenticatable implements MustVerifyEmail {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -58,6 +59,13 @@ class User extends Authenticatable implements MustVerifyEmail {
                 Cache::forget("user_{$user->id}_avatar");
             }
         });
+    }
+
+    /**
+     *Notes (Catatan)
+     */
+    public function notes(): HasMany {
+        return $this->hasMany(Note::class);
     }
 
     /**

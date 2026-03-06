@@ -14,6 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     require __DIR__ . '/web/task-labels.php';
     require __DIR__ . '/web/task-statuses.php';
     require __DIR__ . '/web/kanban.php';
+    require __DIR__ . '/web/notes.php'; 
 
     Route::middleware('role:admin')->group(function () {
         require __DIR__ . '/web/admin.php';

@@ -1,4 +1,10 @@
-import { ListTodo, SquareChartGantt, Users, LayoutDashboard } from "lucide-react";
+import { 
+  ListTodo, 
+  SquareChartGantt, 
+  Users, 
+  LayoutDashboard, 
+  StickyNote
+} from "lucide-react";
 import { RolesEnum } from "@/types/enums";
 
 import { NavMain } from "./NavMain";
@@ -64,7 +70,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
         ],
       },
-      // Tampilkan menu Pengguna hanya jika user adalah admin
+      {
+        title: "Catatan",
+        url: route("notes.index"),
+        icon: StickyNote,
+      },
       ...(auth.user.roles?.includes(RolesEnum.Admin)
         ? [
             {

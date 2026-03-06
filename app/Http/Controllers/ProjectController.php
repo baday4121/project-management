@@ -22,17 +22,12 @@ class ProjectController extends Controller {
         $this->projectService = $projectService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index() {
         $user = Auth::user();
         $filters = request()->all();
 
-        // Get the requested tab, but don't force a default
         $requestedTab = request()->query('tab');
 
-        // Let the service handle all the query building including eager loading
         $projects = $this->projectService->getProjects($user, $filters);
 
         return Inertia::render('Project/Index', [
@@ -50,24 +45,16 @@ class ProjectController extends Controller {
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create() {
         return Inertia::render('Project/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreProjectRequest $request) {
         $data = $request->validated();
         $project = $this->projectService->storeProject($data);
 
-        // Get the authenticated user
         $user = Auth::user();
 
-        // Attach user to project with ProjectManager role
         $project->invitedUsers()->attach($user->id, [
             'status' => 'accepted',
             'role' => RolesEnum::ProjectManager->value,
@@ -75,37 +62,30 @@ class ProjectController extends Controller {
             'updated_at' => now()
         ]);
 
-        // Assign ProjectManager role to user if they don't have it
         if (!$user->hasRole(RolesEnum::ProjectManager->value)) {
             $user->assignRole(RolesEnum::ProjectManager->value);
         }
 
-        return to_route('project.index')->with('success', "Project '{$project->name}' created successfully.");
+        return to_route('project.index')->with('success', "Proyek '{$project->name}' berhasil dibuat.");
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Project $project) {
         $user = Auth::user();
         if (!$project->acceptedUsers()->where('user_id', $user->id)->whereIn('role', [RolesEnum::ProjectManager->value, RolesEnum::ProjectMember->value])->exists()) {
-            abort(403, 'You are not authorized to view this project.');
+            abort(403, 'Anda tidak memiliki otoritas untuk melihat proyek ini.');
         }
 
-        // Get the requested tab, but don't force a default
         $requestedTab = request()->query('tab');
 
-        // Only validate tab if one was provided
         if ($requestedTab) {
             if ($requestedTab === 'invite' && $project->isProjectMember($user)) {
-                abort(403, 'Project members cannot access the invite section.');
+                abort(403, 'Anggota proyek tidak dapat mengakses bagian undangan.');
             }
         }
 
-        // Ensure sorting parameters are explicitly set
         $filters = request()->all();
         $filters['sort_field'] = request('sort_field', 'created_at');
-        $filters['sort_direction'] = request('sort_direction'); // No default
+        $filters['sort_direction'] = request('sort_direction'); 
         $filters['per_page'] = (int) request('per_page', 10);
         $filters['page'] = (int) request('page', 1);
 
@@ -130,13 +110,40 @@ class ProjectController extends Controller {
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    public function assets(Project $project) {
+        $user = Auth::user();
+        
+        if (!$project->isProjectMember($user) && !$project->canEditProject($user)) {
+            abort(403, 'Anda tidak memiliki akses ke galeri aset proyek ini.');
+        }
+
+        $assets = $project->tasks()
+            ->whereNotNull('image_path')
+            ->select('id', 'name as task_name', 'image_path', 'updated_at')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return Inertia::render('Project/Assets', [
+            'project' => $project->only('id', 'name'),
+            'assets' => $assets->map(function($asset) {
+                return [
+                    'task_id' => $asset->id,
+                    'task_name' => $asset->task_name,
+                    'url' => $asset->image_path,
+                    'type' => pathinfo($asset->image_path, PATHINFO_EXTENSION) ?: 'image',
+                    'date' => $asset->updated_at->diffForHumans(),
+                ];
+            }),
+            'permissions' => [
+                'canEditProject' => $project->canEditProject($user),
+            ]
+        ]);
+    }
+
     public function edit(Project $project) {
         $user = Auth::user();
         if (!$project->canManage($user)) {
-            abort(403, 'You are not authorized to edit this project.');
+            abort(403, 'Anda tidak memiliki otoritas untuk mengedit proyek ini.');
         }
 
         return Inertia::render('Project/Edit', [
@@ -144,33 +151,27 @@ class ProjectController extends Controller {
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateProjectRequest $request, Project $project) {
         $user = Auth::user();
         if (!$project->canManage($user)) {
-            abort(403, 'You are not authorized to update this project.');
+            abort(403, 'Anda tidak memiliki otoritas untuk memperbarui proyek ini.');
         }
 
         $data = $request->validated();
         $this->projectService->updateProject($project, $data);
 
-        return to_route('project.index')->with('success', "Project '{$project->name}' updated successfully.");
+        return to_route('project.index')->with('success', "Proyek '{$project->name}' berhasil diperbarui.");
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Project $project) {
         $user = Auth::user();
         if (!$project->canManage($user)) {
-            abort(403, 'You are not authorized to delete this project.');
+            abort(403, 'Anda tidak memiliki otoritas untuk menghapus proyek ini.');
         }
 
         $this->projectService->deleteProject($project);
 
-        return to_route('project.index')->with('success', "Project '{$project->name}' deleted successfully.");
+        return to_route('project.index')->with('success', "Proyek '{$project->name}' berhasil dihapus.");
     }
 
     public function inviteUser(Request $request, Project $project) {
@@ -197,12 +198,12 @@ class ProjectController extends Controller {
 
     public function acceptInvitation(Project $project) {
         $this->projectService->updateInvitationStatus($project, Auth::user(), 'accepted');
-        return redirect()->back()->with('success', 'Invitation accepted.');
+        return redirect()->back()->with('success', 'Undangan telah diterima.');
     }
 
     public function rejectInvitation(Project $project) {
         $this->projectService->updateInvitationStatus($project, Auth::user(), 'rejected');
-        return redirect()->back()->with('success', 'Invitation rejected.');
+        return redirect()->back()->with('success', 'Undangan telah ditolak.');
     }
 
     public function leaveProject(Project $project) {
@@ -226,7 +227,7 @@ class ProjectController extends Controller {
         $user = Auth::user();
 
         if (!$project->canKickProjectMember($user)) {
-            abort(403, 'You are not authorized to kick members from this project.');
+            abort(403, 'Anda tidak memiliki otoritas untuk mengeluarkan anggota dari proyek ini.');
         }
 
         $request->validate([
@@ -236,14 +237,13 @@ class ProjectController extends Controller {
 
         $userIds = $request->user_ids;
 
-        // Check if trying to kick project managers without permission
         $projectManagers = $project->acceptedUsers()
             ->whereIn('user_id', $userIds)
             ->where('role', RolesEnum::ProjectManager->value)
             ->exists();
 
         if ($projectManagers && !$project->canKickProjectManager($user)) {
-            abort(403, 'You are not authorized to kick project managers.');
+            abort(403, 'Anda tidak memiliki otoritas untuk mengeluarkan Manajer Proyek.');
         }
 
         $result = $this->projectService->kickMembers($project, $userIds);
@@ -275,25 +275,23 @@ class ProjectController extends Controller {
 
     public function deleteImage(Project $project) {
         if (!$project->canEditProject(Auth::user())) {
-            abort(403, 'You are not authorized to delete this project\'s image.');
+            abort(403, 'Anda tidak memiliki otoritas untuk menghapus gambar proyek ini.');
         }
 
-        // Delete the image file
         if ($project->image_path) {
             Storage::disk('public')->delete($project->image_path);
         }
 
-        // Update the project record
         $project->update(['image_path' => null]);
 
-        return back()->with('success', 'Project image deleted successfully.');
+        return back()->with('success', 'Gambar proyek berhasil dihapus.');
     }
 
     public function checkInvitation(Request $request, Project $project) {
         $email = $request->query('email');
 
         $hasPendingInvitation = $project->invitedUsers()
-            ->where('email', 'LIKE', $email . '%') // Using LIKE for partial match
+            ->where('email', 'LIKE', $email . '%') 
             ->wherePivot('status', 'pending')
             ->exists();
 

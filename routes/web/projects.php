@@ -10,6 +10,9 @@ Route::get('/project', [ProjectController::class, 'index'])->name('project.index
 Route::get('/project/create', [ProjectController::class, 'create'])->name('project.create');
 Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
 Route::get('/project/{project}', [ProjectController::class, 'show'])->name('project.show');
+
+Route::get('/project/{project}/assets', [ProjectController::class, 'assets'])->name('project.assets');
+
 Route::post('/project/{project}/leave', [ProjectController::class, 'leaveProject'])->name('project.leave');
 Route::get('/project/{project}/check-role', [ProjectController::class, 'checkRole'])->name('project.check-role');
 Route::put('/project/{project}/update-user-role', [ProjectController::class, 'updateUserRole'])->name('project.update-user-role');

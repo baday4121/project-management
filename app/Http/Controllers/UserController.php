@@ -20,7 +20,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar pengguna.
      */
     public function index() {
         $query = User::query();
@@ -28,7 +28,7 @@ class UserController extends Controller {
         $sortField = request("sort_field", "created_at");
         $sortDirection = request("sort_direction", "desc");
 
-        // Handle filters
+        // Menangani filter
         if (request("name")) {
             $query->where("name", "like", "%" . request("name") . "%");
         }
@@ -52,8 +52,9 @@ class UserController extends Controller {
             'success' => session('success'),
         ]);
     }
+
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan formulir pembuatan pengguna baru.
      */
     public function create() {
         return Inertia::render('User/Create', [
@@ -62,26 +63,26 @@ class UserController extends Controller {
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan pengguna baru ke database.
      */
     public function store(StoreUserRequest $request) {
         $data = $request->validated();
-        $data['email_verified_at'] = time();
+        $data['email_verified_at'] = now();
         $data['password'] = bcrypt($data['password']);
         User::create($data);
 
-        return to_route('user.index')->with('success', 'User created successfully.');
+        return to_route('user.index')->with('success', 'Pengguna berhasil dibuat.');
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan detail pengguna spesifik.
      */
     public function show(User $user) {
         //
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan formulir edit pengguna.
      */
     public function edit(User $user) {
         return Inertia::render('User/Edit', [
@@ -91,7 +92,7 @@ class UserController extends Controller {
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui data pengguna di database.
      */
     public function update(UpdateUserRequest $request, User $user) {
         $data = $request->validated();
@@ -105,22 +106,19 @@ class UserController extends Controller {
 
         $user->update($data);
 
-        return to_route('user.index')->with('success', 'User updated successfully.');
+        return to_route('user.index')->with('success', 'Data pengguna berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user) {
         $name = $user->name;
 
         if ($user->id === Auth::id()) {
-            return to_route('user.index')->with('error', "You can't delete yourself.");
+            return to_route('user.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
         $this->userService->deleteUser($user);
 
-        return to_route('user.index')->with('success', "User '$name' deleted successfully.");
+        return to_route('user.index')->with('success', "Pengguna '$name' berhasil dihapus.");
     }
 
     public function search(Request $request, Project $project) {
@@ -130,11 +128,9 @@ class UserController extends Controller {
             return response()->json(['users' => []]);
         }
 
-        // First check if the email exists in our system
         $user = User::where('email', $query)->first();
 
         if ($user) {
-            // Check project membership first
             $isMember = $user->id == $project->created_by ||
                 $project->invitedUsers()
                 ->where('user_id', $user->id)
@@ -143,12 +139,11 @@ class UserController extends Controller {
 
             if ($isMember) {
                 return response()->json([
-                    'error' => 'This user is already part of the project.',
+                    'error' => 'Pengguna ini sudah menjadi bagian dari proyek.',
                     'users' => []
                 ], 409);
             }
 
-            // Then check pending invitations
             $hasPendingInvite = $project->invitedUsers()
                 ->where('user_id', $user->id)
                 ->wherePivot('status', 'pending')
@@ -156,26 +151,23 @@ class UserController extends Controller {
 
             if ($hasPendingInvite) {
                 return response()->json([
-                    'error' => 'This user has already been invited and the invitation is pending.',
+                    'error' => 'Pengguna ini sudah diundang dan statusnya masih menunggu konfirmasi.',
                     'users' => []
                 ], 409);
             }
 
-            // If user exists and isn't a member or pending, return them
             return response()->json(['users' => [$user]]);
         }
 
-        // No user found with this email
         if (filter_var($query, FILTER_VALIDATE_EMAIL)) {
             return response()->json([
-                'error' => 'No users found with this email.',
+                'error' => 'Tidak ada pengguna yang ditemukan dengan email ini.',
                 'users' => []
             ], 404);
         }
 
-        // Invalid email format
         return response()->json([
-            'error' => 'Please enter a valid email address.',
+            'error' => 'Silakan masukkan alamat email yang valid.',
             'users' => []
         ], 422);
     }

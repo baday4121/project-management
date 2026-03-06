@@ -22,10 +22,11 @@ class ProjectInvitationNotification extends Notification {
 
   public function toMail($notifiable): MailMessage {
     return (new MailMessage)
-      ->subject("You've been invited to join {$this->project->name}")
-      ->greeting("Hello {$notifiable->name}!")
-      ->line("You have been invited to join the project: {$this->project->name}")
-      ->action('View Invitation', route('project.invitations'))
-      ->line('You can accept or reject this invitation from your invitations page.');
+      ->subject("Undangan Bergabung: {$this->project->name}")
+      ->greeting("Halo, {$notifiable->name}!")
+      ->line("Anda telah diundang untuk bergabung dalam proyek: **{$this->project->name}**.")
+      ->action('Lihat Undangan', route('project.invitations'))
+      ->line('Anda dapat menerima atau menolak undangan ini langsung melalui halaman undangan di akun Anda.')
+      ->line('Terima kasih telah menggunakan WorkDei!');
   }
 }

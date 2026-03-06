@@ -17,13 +17,14 @@ export function useProjectInvitationNotifications() {
       "ProjectInvitationRequestReceived",
       (event: ProjectInvitationEvent) => {
         const toaster = toast({
-          title: "New Project Invitation",
-          description: `You've been invited to join ${event.project.name}`,
+          title: "Undangan Proyek Baru",
+          description: `Anda telah diundang untuk bergabung dalam proyek ${event.project.name}`,
           variant: "default",
           action: (
             <div className="flex gap-2">
               <Button
                 size="sm"
+                className="font-bold"
                 onClick={() => {
                   router.post(
                     route("project.acceptInvitation", event.project.id),
@@ -31,15 +32,16 @@ export function useProjectInvitationNotifications() {
                     {
                       onSuccess: () => {
                         toast({
-                          title: "Invitation Accepted",
-                          description: `You just joined ${event.project.name}`,
+                          title: "Undangan Diterima",
+                          description: `Anda berhasil bergabung di proyek ${event.project.name}`,
                           variant: "success",
                           action: (
-                            <ToastAction altText="View Project">
+                            <ToastAction altText="Lihat Proyek">
                               <Link
                                 href={route("project.show", event.project.id)}
+                                className="font-bold"
                               >
-                                View Project
+                                Lihat Proyek
                               </Link>
                             </ToastAction>
                           ),
@@ -50,11 +52,12 @@ export function useProjectInvitationNotifications() {
                   dismiss(toaster.id);
                 }}
               >
-                Accept
+                Terima
               </Button>
               <Button
                 size="sm"
                 variant="destructive"
+                className="font-bold"
                 onClick={() => {
                   router.post(
                     route("project.rejectInvitation", event.project.id),
@@ -62,8 +65,8 @@ export function useProjectInvitationNotifications() {
                     {
                       onSuccess: () => {
                         toast({
-                          title: "Invitation Rejected",
-                          description: `You rejected the invitation for ${event.project.name}`,
+                          title: "Undangan Ditolak",
+                          description: `Anda telah menolak undangan untuk proyek ${event.project.name}`,
                           variant: "destructive",
                         });
                       },
@@ -72,7 +75,7 @@ export function useProjectInvitationNotifications() {
                   dismiss(toaster.id);
                 }}
               >
-                Reject
+                Tolak
               </Button>
             </div>
           ),

@@ -19,7 +19,6 @@ class TaskStatusService extends BaseService {
         ->orWhere('project_id', $project->id);
     })->with('createdBy');
 
-    // Get all filter values from the request
     $filters = array_merge([
       'name' => request('name'),
       'color' => request('color'),
@@ -29,17 +28,14 @@ class TaskStatusService extends BaseService {
       'per_page' => request('per_page', 10)
     ], $filters);
 
-    // Apply name filter
     if (!empty($filters['name'])) {
       $query->where('name', 'like', '%' . $filters['name'] . '%');
     }
 
-    // Apply color filter
     if (!empty($filters['color'])) {
       $query->where('color', $filters['color']);
     }
 
-    // Apply sorting
     $query = $this->applySorting(
       $query,
       $filters['sort_field'],
@@ -60,7 +56,7 @@ class TaskStatusService extends BaseService {
 
   public function updateStatus(TaskStatus $status, array $data) {
     if ($status->is_default) {
-      throw new \Exception('Cannot edit default statuses.');
+      throw new \Exception('Status bawaan sistem tidak dapat diubah.');
     }
 
     $data['updated_by'] = Auth::id();
@@ -72,11 +68,11 @@ class TaskStatusService extends BaseService {
 
   public function deleteStatus(TaskStatus $status) {
     if ($status->is_default) {
-      throw new \Exception('Cannot delete default statuses.');
+      throw new \Exception('Status bawaan sistem tidak dapat dihapus.');
     }
 
     if ($status->tasks()->exists()) {
-      throw new \Exception('Cannot delete status that has tasks. Please reassign tasks to another status first.');
+      throw new \Exception('Gagal menghapus: Status ini masih digunakan oleh beberapa tugas. Silakan pindahkan tugas tersebut ke status lain terlebih dahulu.');
     }
 
     return $status->delete();

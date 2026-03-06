@@ -45,7 +45,6 @@ export function KanbanBoard({ columns, projectId, permissions }: Props) {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
 
-    // Only handle task dragging
     for (const column of columns) {
       const task = column.tasks.find((t) => t.id === Number(active.id));
       if (task) {
@@ -73,8 +72,8 @@ export function KanbanBoard({ columns, projectId, permissions }: Props) {
         );
       } catch (error) {
         toast({
-          title: "Error",
-          description: "Failed to move task. Please try again.",
+          title: "Gagal Memindahkan",
+          description: "Tugas gagal dipindahkan. Silakan coba beberapa saat lagi.",
           variant: "destructive",
         });
       }
@@ -112,8 +111,8 @@ export function KanbanBoard({ columns, projectId, permissions }: Props) {
                       column.color ? `bg-${column.color}-500` : "bg-secondary",
                     )}
                   />
-                  <span className="truncate">{column.name}</span>
-                  <span className="flex-shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs">
+                  <span className="truncate font-bold">{column.name}</span>
+                  <span className="flex-shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-black">
                     {column.tasks?.length || 0}
                   </span>
                 </div>

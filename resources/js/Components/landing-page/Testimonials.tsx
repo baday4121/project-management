@@ -14,45 +14,45 @@ interface TestimonialProps {
 const testimonials: TestimonialProps[] = [
   {
     image: "https://i.pravatar.cc/150?img=32",
-    name: "Sarah Chen",
-    userName: "Tech Lead",
+    name: "Siti Aminah",
+    userName: "Lead Developer",
     comment:
-      "WorkDei telah merevolusi cara kami menangani alur kerja proyek. Sistem manajemen tugasnya sangat intuitif dan bertenaga.",
+      "WorkDei benar-benar mengubah cara tim kami mengelola alur kerja. Sistem manajemen tugasnya sangat intuitif dan sangat membantu efisiensi.",
   },
   {
     image: "https://i.pravatar.cc/150?img=41",
     name: "Budi Santoso",
-    userName: "Product Manager",
+    userName: "Project Manager",
     comment:
-      "Fitur kolaborasi real-time membuat tim remote kami merasa lebih terhubung. Alat yang luar biasa untuk manajemen modern.",
+      "Fitur kolaborasi real-time membuat tim remote kami merasa selalu terhubung. Ini adalah tools wajib untuk manajemen proyek modern.",
   },
   {
     image: "https://i.pravatar.cc/150?img=15",
-    name: "Emma Thompson",
-    userName: "Scrum Master",
+    name: "Dewi Lestari",
+    userName: "Business Analyst",
     comment:
-      "Diskusi tugas menjaga semua komunikasi tetap terorganisir. Tidak ada lagi feedback yang hilang di tumpukan email.",
+      "Diskusi tugas menjaga semua komunikasi tetap terorganisir di satu tempat. Tidak ada lagi feedback yang terselip di antara ribuan email.",
   },
   {
     image: "https://i.pravatar.cc/150?img=54",
-    name: "James Wilson",
-    userName: "DevOps Engineer",
+    name: "Rizky Pratama",
+    userName: "Fullstack Engineer",
     comment:
-      "Interface bersih dan fitur bertenaga. Tepat seperti yang kami butuhkan untuk menjaga kecepatan workflow setiap hari.",
+      "Interface yang bersih dengan fitur yang sangat bertenaga. Sangat tepat untuk menjaga kecepatan workflow kami setiap harinya.",
   },
   {
     image: "https://i.pravatar.cc/150?img=24",
-    name: "Maria Garcia",
-    userName: "Frontend Developer",
+    name: "Anisa Fitri",
+    userName: "UI/UX Designer",
     comment:
-      "Pengorganisasian tugas membuat perencanaan sprint kami jauh lebih efisien dan transparan bagi seluruh anggota tim.",
+      "Pengorganisasian tugasnya membuat perencanaan desain kami jauh lebih transparan bagi seluruh anggota tim pengembang.",
   },
   {
     image: "https://i.pravatar.cc/150?img=60",
-    name: "David Kim",
+    name: "Agus Wijaya",
     userName: "Engineering Manager",
     comment:
-      "WorkDei secara signifikan meningkatkan produktivitas. Kemampuan memantau tugas secara real-time sangatlah berharga.",
+      "WorkDei secara signifikan meningkatkan produktivitas Nexicon. Kemampuan memantau progres tugas secara real-time sangatlah berharga.",
   },
 ];
 
@@ -63,7 +63,6 @@ export const Testimonials = () => {
 
   return (
     <section id="testimonials" className="relative overflow-hidden bg-background py-24">
-      {/* Dekorasi Latar Belakang */}
       <div className="absolute left-1/4 top-0 -z-10 h-64 w-64 rounded-full bg-primary/5 blur-[100px]" />
       <div className="absolute right-1/4 bottom-0 -z-10 h-64 w-64 rounded-full bg-blue-500/5 blur-[100px]" />
 
@@ -80,7 +79,6 @@ export const Testimonials = () => {
           </h2>
         </div>
 
-        {/* Viewport Carousel */}
         <div className="cursor-grab active:cursor-grabbing" ref={emblaRef}>
           <div className="flex">
             {testimonials.map((item, index) => (

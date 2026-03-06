@@ -34,7 +34,7 @@ export const Features = () => {
           </span>
         </h2>
         <p className="mt-6 max-w-2xl text-lg font-medium text-muted-foreground/80">
-          Lupakan kerumitan beralih antar aplikasi. WorkDei menyatukan semua yang tim Nexicon butuhkan dalam satu ekosistem yang kohesif.
+          Lupakan kerumitan beralih antar aplikasi. WorkDei menyatukan semua yang tim butuhkan dalam satu ekosistem yang kohesif.
         </p>
       </div>
 
@@ -46,7 +46,7 @@ export const Features = () => {
           className="md:col-span-3 md:row-span-1 bg-gradient-to-br from-primary/10 via-background to-background"
           icon={<ClipboardList className="h-8 w-8 text-primary" />}
           title="Manajemen Tugas Pro"
-          description="Sistem manajemen tugas intuitif untuk memantau progres proyek Nexicon secara real-time dari awal hingga rilis."
+          description="Sistem manajemen tugas intuitif untuk memantau progres proyek secara real-time dari awal hingga rilis."
         />
 
         {/* Feature 2: Small Card (Span 3) */}

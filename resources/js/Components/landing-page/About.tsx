@@ -41,7 +41,7 @@ export const About = () => {
               <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl lg:mx-0">
                 WorkDei menghadirkan ekosistem digital terpadu untuk efisiensi maksimal. 
                 Dari pemantauan tugas hingga kolaborasi real-time, setiap fitur dirancang untuk memastikan 
-                tim **Nexicon** tetap terorganisir dan produktif.
+                tim tetap terorganisir dan produktif.
               </p>
             </div>
 

@@ -63,11 +63,14 @@ class NoteController extends Controller
     }
 
     public function destroy(Note $note)
-    {
-        $this->authorize('delete', $note);
-        
-        $note->delete();
+        {
 
-        return back()->with('success', 'Catatan berhasil dihapus.');
-    }
+            if ($note->user_id !== auth()->id()) {
+                abort(403, 'Akses ditolak.');
+            }
+            
+            $note->delete();
+
+            return back()->with('success', 'Catatan berhasil dihapus.');
+        }
 }

@@ -13,6 +13,13 @@ export default function Assets({ project, assets }: any) {
     asset.task_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Helper untuk memastikan path gambar benar
+  const getAssetUrl = (url: string) => {
+    if (!url) return "/images/placeholder.png";
+    if (url.startsWith("http")) return url;
+    return `/storage/${url}`;
+  };
+
   return (
     <AuthenticatedLayout
       header={
@@ -53,9 +60,12 @@ export default function Assets({ project, assets }: any) {
                 <div className="aspect-square relative flex items-center justify-center bg-muted/30 overflow-hidden">
                   {['jpg', 'jpeg', 'png', 'webp', 'svg'].includes(asset.type.toLowerCase()) ? (
                     <img 
-                      src={asset.url} 
+                      src={getAssetUrl(asset.url)} 
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
                       alt={asset.task_name}
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/placeholder.png"; // Pastikan kamu punya file ini di folder public/images
+                      }}
                     />
                   ) : (
                     <div className="flex flex-col items-center gap-3">
@@ -68,7 +78,7 @@ export default function Assets({ project, assets }: any) {
 
                   <div className="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3 z-10 backdrop-blur-[2px]">
                      <Button size="icon" variant="secondary" className="h-10 w-10 rounded-full shadow-xl hover:scale-110" asChild title="Unduh File">
-                        <a href={asset.url} download><Download className="h-5 w-5" /></a>
+                        <a href={getAssetUrl(asset.url)} download><Download className="h-5 w-5" /></a>
                      </Button>
                      <Link href={route('project.show', { project: project.id, tab: 'tasks' })}>
                         <Button size="icon" variant="secondary" className="h-10 w-10 rounded-full shadow-xl hover:scale-110" title="Buka Tugas">
